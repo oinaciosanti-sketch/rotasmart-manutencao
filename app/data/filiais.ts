@@ -5,6 +5,7 @@ export type Filial = {
   cidade: string;
   uf: string;
   endereco: string;
+  bairro: string;
   cep: string;
   cnpj: string;
   inscricaoEstadual: string;
@@ -12,8 +13,10 @@ export type Filial = {
   status: "ativo" | "desativado";
   latitude: number | null;
   longitude: number | null;
-  geocodeStatus: "pendente" | "ok";
-  statusDados: "ok" | "incompleto";
+  geocodeStatus: "pendente" | "preenchida";
+  statusDados: "ok" | "incompleto" | "sem_coordenadas";
+  fonteCoordenada: string;
+  linkMapa: string;
   observacoes: string;
 };
 
@@ -23,13 +26,13 @@ const filial = (
   telefone:string, status:"ativo"|"desativado"="ativo"
 ):Filial => {
   const incompleto=!cidade||!endereco||endereco==="-"||!cep;
-  return {id,numeroFilial,nome,cidade,uf,endereco,cep,cnpj,inscricaoEstadual,telefone,status,
-    latitude:null,longitude:null,geocodeStatus:"pendente",
-    statusDados:incompleto?"incompleto":"ok",
+  return {id,numeroFilial,nome,cidade,uf,endereco,bairro:"",cep,cnpj,inscricaoEstadual,telefone,status,
+    latitude:null,longitude:null,geocodeStatus:"pendente",fonteCoordenada:"",linkMapa:"",
+    statusDados:incompleto?"incompleto":"sem_coordenadas",
     observacoes:incompleto?"Endereço incompleto no documento original":""};
 };
 
-export const filiais: Filial[] = [
+const filiaisDocumento: Filial[] = [
   filial(1,"01","Posto Agricopel Filial 01 — Panetteria","Jaraguá do Sul","SC","Rua Walter Marquardt, 467 — Vila Nova","89259-700","83.488.882/0002-94","252.910.494","(47) 3372-8888"),
   filial(2,"02","Posto Agricopel Filial 02","Piên","PR","Rodovia PR 281, Km 32, 80 — Fernandes","83860-000","83.488.882/0003-75","90414044-90","(41) 3632-1908"),
   filial(3,"03","Posto Agricopel Filial 03","Jaraguá do Sul","SC","Rua Bernardo Dornbusch, 2400 — Baependi","89256-100","83.488.882/0004-56","252.993.675","(47) 3276-1502"),
@@ -72,6 +75,33 @@ export const filiais: Filial[] = [
   filial(40,"76","Posto Agricopel Filial 76 — Vorstadt","Blumenau","SC","Rua Itajaí, 2081 — Vorstadt","89015-203","83.488.882/0077-01","",""),
   filial(41,"77","Posto Agricopel Filial 77 — Itoupava Norte","Blumenau","SC","Rua 2 de Setembro, 3255 — Itoupava Norte","89052-505","83.488.882/0078-92","",""),
 ];
+
+const coordenadas:Record<string,[number,number,string]> = {
+ "83.488.882/0001-03":[-26.4996185,-49.08767128,"ANP/PMQC"],
+ "83.488.882/0004-56":[-26.48018115,-49.0564048,"ANP/PMQC"],
+ "83.488.882/0006-18":[-27.10328503,-48.91551368,"ANP/PMQC"],
+ "83.488.882/0007-07":[-26.28042,-48.84657833,"ANP/PMQC"],
+ "83.488.882/0008-80":[-26.47756444,-49.10273558,"ANP/PMQC"],
+ "83.488.882/0013-47":[-26.92205528,-48.70755334,"ANP/PMQC"],
+ "83.488.882/0017-70":[-26.87776244,-49.13040537,"ANP/PMQC"],
+ "83.488.882/0023-19":[-26.51416258,-49.1199277,"ANP/PMQC"],
+ "83.488.882/0028-23":[-26.57918518,-49.13961511,"ANP/PMQC"],
+ "83.488.882/0033-90":[-26.93948496,-48.70451492,"ANP/PMQC"],
+ "83.488.882/0034-71":[-26.92254686,-48.67516319,"ANP/PMQC"],
+ "83.488.882/0035-52":[-26.98265167,-48.64341667,"ANP/PMQC"],
+ "83.488.882/0036-33":[-27.40582833,-49.60322167,"ANP/PMQC"],
+ "83.488.882/0044-43":[-26.43580333,-48.81032333,"ANP/PMQC"],
+ "83.488.882/0045-24":[-26.88645833,-49.08245833,"ANP/PMQC"],
+ "83.488.882/0048-77":[-26.47739103,-48.99606147,"ANP/PMQC"],
+ "83.488.882/0052-53":[-26.93089205,-49.05950538,"ANP/PMQC"],
+ "83.488.882/0055-04":[-26.85215833,-48.71086,"ANP/PMQC"],
+ "83.488.882/0058-49":[-27.6047738,-48.63273622,"ANP/PMQC"],
+};
+
+export const filiais:Filial[]=filiaisDocumento.map(f=>{
+ const c=coordenadas[f.cnpj];
+ return c?{...f,latitude:c[0],longitude:c[1],geocodeStatus:"preenchida",statusDados:"ok",fonteCoordenada:c[2],linkMapa:`https://www.google.com/maps/search/?api=1&query=${c[0]},${c[1]}`} : f;
+});
 
 export const cidadesFiliais = Array.from(new Set(filiais.map(f=>f.cidade).filter(Boolean))).sort((a,b)=>a.localeCompare(b,"pt-BR"));
 
