@@ -1,5 +1,14 @@
 # RotaSmart Manutenção
 
+## MVP 1.6
+
+- Base Agricopel de Jaraguá do Sul configurada como origem padrão em `-26.459964, -49.039587` para Wagner, Vinícius e Valdemir, preservando pontos personalizados.
+- Analista responsável nos chamados, filtros operacionais e visão gerencial dinâmica.
+- Planner semanal com cards compactos: chamado, filial e cidade.
+- Backup completo em JSON com importação por combinação ou substituição.
+- Exportações CSV nas telas de Chamados, Planner e Dashboard.
+- Dados mantidos no `localStorage` do navegador, sem necessidade de banco nesta versão.
+
 ## MVP 1.5
 
 Ferramenta operacional frontend para cadastro de chamados, planejamento semanal,
