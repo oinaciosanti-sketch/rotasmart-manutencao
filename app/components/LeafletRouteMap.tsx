@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import {useEffect} from "react";
 import {CircleMarker,MapContainer,Polyline,Popup,TileLayer,useMap} from "react-leaflet";
 import type {LatLngBoundsExpression,LatLngExpression} from "leaflet";

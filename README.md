@@ -1,5 +1,19 @@
 # RotaSmart Manutenção
 
+## MVP 1.4.1 funcional
+
+Os dados operacionais são mantidos em uma fonte única no frontend e persistidos automaticamente no `localStorage` pela chave `rotasmart-app-data-v1`. Chamados, técnicos, filiais, planejamento e rotas usam o mesmo estado.
+
+### Importação CSV
+
+Abra **Importar chamados**, baixe o modelo ou selecione um CSV real. O arquivo deve usar vírgula ou ponto e vírgula e pode conter: `numeroChamado`, `filial`, `cidade`, `descricao`, `status`, `urgencia`, `tecnicoPlanejado`, `dataPlanejada`, `tempoEstimado`, `dataAbertura`, `dataLimite`, `analista` e `observacoes`.
+
+Chamados existentes são identificados pelo número. Dados de planejamento do RotaSmart são preservados. Nesta versão local, XLS/XLSX ainda não é processado; exporte a planilha como CSV antes de importar.
+
+### Restaurar dados iniciais
+
+Use **Limpar dados locais** no menu lateral. A ação pede confirmação e restaura os dados iniciais ao recarregar.
+
 MVP visual e navegável para planejamento de rotas de técnicos de manutenção.
 
 ## Recursos

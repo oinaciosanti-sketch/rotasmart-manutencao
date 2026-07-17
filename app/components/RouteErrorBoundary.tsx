@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React from "react";
 export default class RouteErrorBoundary extends React.Component<{children:React.ReactNode},{hasError:boolean}>{
  state={hasError:false};
