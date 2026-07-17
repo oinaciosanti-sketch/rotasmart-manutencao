@@ -1,11 +1,5 @@
-export function calculateDistanceKm(lat1:number,lon1:number,lat2:number,lon2:number){
- const r=6371; const rad=(n:number)=>n*Math.PI/180;
- const dLat=rad(lat2-lat1),dLon=rad(lon2-lon1);
- const a=Math.sin(dLat/2)**2+Math.cos(rad(lat1))*Math.cos(rad(lat2))*Math.sin(dLon/2)**2;
- return 2*r*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-
-export function calculateRouteDistance(points:Array<{latitude:number|null;longitude:number|null}>){
- if(points.length<2||points.some(p=>p.latitude===null||p.longitude===null))return null;
- return points.slice(1).reduce((sum,p,i)=>sum+calculateDistanceKm(points[i].latitude!,points[i].longitude!,p.latitude!,p.longitude!),0);
-}
+﻿export type CoordinatePoint={latitude?:number|null;longitude?:number|null};
+export function isValidCoordinate(lat:unknown,lng:unknown):boolean{return typeof lat==="number"&&typeof lng==="number"&&Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=-90&&lat<=90&&lng>=-180&&lng<=180;}
+export function getValidRoutePoints<T extends CoordinatePoint>(route:T[]):T[]{return Array.isArray(route)?route.filter(point=>isValidCoordinate(point?.latitude,point?.longitude)):[];}
+export function calculateDistanceKm(lat1:number,lon1:number,lat2:number,lon2:number){if(!isValidCoordinate(lat1,lon1)||!isValidCoordinate(lat2,lon2))return null;const r=6371;const rad=(n:number)=>n*Math.PI/180;const dLat=rad(lat2-lat1),dLon=rad(lon2-lon1);const a=Math.sin(dLat/2)**2+Math.cos(rad(lat1))*Math.cos(rad(lat2))*Math.sin(dLon/2)**2;return 2*r*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+export function calculateRouteDistance(points:CoordinatePoint[]){if(!Array.isArray(points)||points.length<2||points.some(p=>!isValidCoordinate(p?.latitude,p?.longitude)))return null;return points.slice(1).reduce<number>((sum,p,i)=>sum+(calculateDistanceKm(points[i].latitude!,points[i].longitude!,p.latitude!,p.longitude!)??0),0);}

@@ -1,47 +1,9 @@
-"use client";
-
-import { useEffect } from "react";
-import { CircleMarker, MapContainer, Polyline, Popup, TileLayer, useMap } from "react-leaflet";
-import type { LatLngBoundsExpression, LatLngExpression } from "leaflet";
-
-export type LeafletStop = {
-  id:number; number:string; branch:string; city:string; address:string;
-  technician:string; status:string; order:number; urgency:string;
-  latitude:number; longitude:number;
-};
-export type LeafletRoute = {
-  technician:string; color:string;
-  start?:{description:string;latitude:number;longitude:number};
-  stops:LeafletStop[];
-};
-
-function FitMap({routes}:{routes:LeafletRoute[]}){
- const map=useMap();
- useEffect(()=>{
-  const points:LatLngExpression[]=[];
-  routes.forEach(r=>{if(r.start)points.push([r.start.latitude,r.start.longitude]);r.stops.forEach(s=>points.push([s.latitude,s.longitude]))});
-  if(points.length)map.fitBounds(points as LatLngBoundsExpression,{padding:[35,35],maxZoom:12});
- },[map,routes]);
- return null;
-}
-
-export default function LeafletRouteMap({routes}:{routes:LeafletRoute[]}){
- const defaultCenter:LatLngExpression=[-26.4996185,-49.08767128];
- return <div className="leaflet-map-wrap">
-  <MapContainer center={defaultCenter} zoom={8} scrollWheelZoom className="leaflet-map">
-   <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
-   <FitMap routes={routes}/>
-   {routes.map(route=>{
-    const line:LatLngExpression[]=[];
-    if(route.start)line.push([route.start.latitude,route.start.longitude]);
-    route.stops.forEach(s=>line.push([s.latitude,s.longitude]));
-    return <div key={route.technician}>
-     {route.start&&<CircleMarker center={[route.start.latitude,route.start.longitude]} radius={10} pathOptions={{color:route.color,fillColor:"#fff",fillOpacity:1,weight:4}}><Popup><b>Ponto de saída · {route.technician}</b><br/>{route.start.description}</Popup></CircleMarker>}
-     {route.stops.map(stop=><CircleMarker key={stop.id} center={[stop.latitude,stop.longitude]} radius={9} pathOptions={{color:"#fff",fillColor:route.color,fillOpacity:1,weight:3}}><Popup><div className="map-popup"><b>{stop.order}. {stop.number}</b><span>{stop.branch}</span><span>{stop.city}</span><span>{stop.address}</span><hr/><span>Técnico: {stop.technician}</span><span>Status: {stop.status}</span><span>Urgência: {stop.urgency}</span></div></Popup></CircleMarker>)}
-     {line.length>1&&<Polyline positions={line} pathOptions={{color:route.color,weight:5,opacity:.82,dashArray:"8 7"}}/>}
-    </div>;
-   })}
-  </MapContainer>
-  <div className="leaflet-approx-note">Linha aproximada entre pontos. Ainda não considera ruas/rodovias.</div>
- </div>;
-}
+﻿"use client";
+import {useEffect} from "react";
+import {CircleMarker,MapContainer,Polyline,Popup,TileLayer,useMap} from "react-leaflet";
+import type {LatLngBoundsExpression,LatLngExpression} from "leaflet";
+import {getValidRoutePoints,isValidCoordinate} from "../utils/distance";
+export type LeafletStop={id:number|string;number?:string;branch?:string;city?:string;address?:string;technician?:string;status?:string;order?:number;urgency?:string;latitude?:number|null;longitude?:number|null};
+export type LeafletRoute={technician:string;color:string;start?:{description?:string;latitude?:number|null;longitude?:number|null};stops:LeafletStop[]};
+function FitMap({routes}:{routes:LeafletRoute[]}){const map=useMap();useEffect(()=>{const points:LatLngExpression[]=[];routes.forEach(route=>{if(route.start&&isValidCoordinate(route.start.latitude,route.start.longitude))points.push([route.start.latitude!,route.start.longitude!]);getValidRoutePoints(Array.isArray(route.stops)?route.stops:[]).forEach(stop=>points.push([stop.latitude!,stop.longitude!]));});if(points.length)map.fitBounds(points as LatLngBoundsExpression,{padding:[35,35],maxZoom:12});},[map,routes]);return null;}
+export default function LeafletRouteMap({routes}:{routes:LeafletRoute[]}){const safeRoutes=Array.isArray(routes)?routes:[];const defaultCenter:LatLngExpression=[-26.4996185,-49.08767128];const startMissing=safeRoutes.some(route=>route.start&&!isValidCoordinate(route.start.latitude,route.start.longitude));const enoughForLine=safeRoutes.some(route=>getValidRoutePoints([...(route.start?[route.start]:[]),...(Array.isArray(route.stops)?route.stops:[])]).length>=2);return <div className="leaflet-map-wrap"><MapContainer center={defaultCenter} zoom={8} scrollWheelZoom className="leaflet-map"><TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/><FitMap routes={safeRoutes}/>{safeRoutes.map((route,routeIndex)=>{const validStart=route.start&&isValidCoordinate(route.start.latitude,route.start.longitude)?route.start:null;const validStops=getValidRoutePoints(Array.isArray(route.stops)?route.stops:[]);const line:LatLngExpression[]=getValidRoutePoints([...(validStart?[validStart]:[]),...validStops]).map(point=>[point.latitude!,point.longitude!]);return <div key={`${route.technician||"rota"}-${routeIndex}`}>{validStart&&<CircleMarker center={[validStart.latitude!,validStart.longitude!]} radius={10} pathOptions={{color:route.color||"#2563eb",fillColor:"#fff",fillOpacity:1,weight:4}}><Popup><b>Ponto de saída · {route.technician||"Técnico não informado"}</b><br/>{validStart.description||"Endereço não informado"}</Popup></CircleMarker>}{validStops.map((stop,index)=><CircleMarker key={`${stop.id||"parada"}-${index}`} center={[stop.latitude!,stop.longitude!]} radius={9} pathOptions={{color:"#fff",fillColor:route.color||"#2563eb",fillOpacity:1,weight:3}}><Popup><div className="map-popup"><b>{stop.order??index+1}. {stop.number||"Chamado sem número"}</b><span>{stop.branch||"Filial não associada"}</span><span>{stop.city||"Cidade não informada"}</span><span>{stop.address||"Endereço não informado"}</span><hr/><span>Técnico: {stop.technician||route.technician||"Não informado"}</span><span>Status: {stop.status||"Não informado"}</span><span>Urgência: {stop.urgency||"Não informada"}</span></div></Popup></CircleMarker>)}{line.length>=2&&<Polyline positions={line} pathOptions={{color:route.color||"#2563eb",weight:5,opacity:.82,dashArray:"8 7"}}/>}</div>;})}</MapContainer><div className="leaflet-approx-note">Linha aproximada entre pontos. Ainda não considera ruas/rodovias.</div>{startMissing&&<div className="leaflet-approx-note">Ponto de saída sem coordenada.</div>}{!enoughForLine&&<div className="leaflet-approx-note">Não há coordenadas suficientes para desenhar a rota.</div>}</div>;}
