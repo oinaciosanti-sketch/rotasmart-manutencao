@@ -1,24 +1,24 @@
 # RotaSmart Manutenção
 
-## MVP 1.4.2 — hotfix de chamados e filiais
+## MVP 1.5
 
-O MVP usa uma fonte única de estado no frontend e persiste chamados, técnicos,
-filiais e planejamento no `localStorage` (`rotasmart-app-data-v1`).
+Ferramenta operacional frontend para cadastro de chamados, planejamento semanal,
+montagem de rotas e visualização em mapa Leaflet/OpenStreetMap.
 
-Esta versão inclui:
+### Recursos desta versão
 
-- cadastro e edição manual de chamados com validação;
-- persistência após atualizar a página;
-- integração dos chamados com Kanban, Planner, Montar rota e Mapa;
-- mapa real com Leaflet e OpenStreetMap;
-- cálculo aproximado de distância por Haversine;
-- base inicial com 66 filiais importadas da planilha de coordenadas;
-- preservação de dados locais existentes quando há correspondência de filial.
-
-### Restaurar dados iniciais
-
-Use **Limpar dados locais** no menu lateral. A ação pede confirmação e restaura
-os dados iniciais ao recarregar.
+- estado global único para chamados, técnicos, filiais, rotas e pontos de saída;
+- persistência automática em `localStorage`;
+- criação, edição, cancelamento e exclusão de chamados;
+- status `Cancelado` com remoção automática do planejamento ativo;
+- inclusão de chamado existente ou criação de novo chamado pelo Planner;
+- planejamento como rascunho ou rota confirmada;
+- ponto de saída editável por técnico, filial, endereço ou cidade atual;
+- coordenadas manuais opcionais para a origem da rota;
+- mapa sincronizado com chamados, rotas e pontos de saída;
+- Dashboard calculado integralmente a partir dos dados atuais;
+- exportação JSON do resumo operacional;
+- base inicial com 66 filiais e validação segura de coordenadas.
 
 ## Requisitos
 
@@ -41,27 +41,26 @@ pnpm build
 pnpm start
 ```
 
-## Deploy na Vercel pelo GitHub
+## Deploy na Vercel
 
-1. Envie todos os arquivos deste pacote a um repositório GitHub.
+1. Envie os arquivos para um repositório GitHub.
 2. Na Vercel, selecione **Add New > Project**.
 3. Importe o repositório e confirme o framework **Next.js**.
-4. A Vercel usará os comandos definidos em `vercel.json`.
+4. A Vercel usará `vercel.json` para instalar com pnpm e executar o build.
 5. Clique em **Deploy**.
 
-Ao concluir, a Vercel fornecerá uma URL pública semelhante a
-`https://rotasmart-manutencao.vercel.app`, que funciona sem localhost.
+A URL pública gerada pela Vercel funciona sem depender de localhost.
 
-## Importação de chamados
+## Persistência
 
-A tela **Importar chamados** aceita CSV nesta versão. Chamados existentes são
-identificados pelo número e os dados de planejamento já registrados são
-preservados.
+Os dados são armazenados no navegador pela chave `rotasmart-app-data-v1`.
+Use **Limpar dados locais** no menu lateral para restaurar a base inicial.
 
-## Limitações atuais
+## Limitações
 
-- os dados continuam locais ao navegador, sem banco de dados;
-- a linha do mapa liga os pontos diretamente e não segue ruas ou rodovias;
-- a distância é aproximada e não usa API paga de roteamento;
-- uma filial da planilha possui coordenada inválida e é tratada como sem
-  coordenadas para proteger o mapa.
+- ainda não há backend, banco externo, login ou múltiplos usuários;
+- dados salvos em um navegador não são compartilhados com outro dispositivo;
+- a linha do mapa é aproximada e não segue ruas ou rodovias;
+- não há integração real com Movidesk ou API paga de roteamento;
+- exclusões definitivas não mantêm histórico; para histórico operacional, use
+  preferencialmente **Cancelar chamado**.
