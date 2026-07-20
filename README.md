@@ -65,6 +65,26 @@ A URL pública gerada pela Vercel funciona sem depender de localhost.
 Os dados são armazenados no navegador pela chave `rotasmart-app-data-v1`.
 Use **Limpar dados locais** no menu lateral para restaurar a base inicial.
 
+O carregamento valida e normaliza chamados, técnicos, filiais e pontos de saída.
+Registros inválidos são ignorados individualmente e uma cópia de recuperação é
+mantida na chave `rotasmart-recovery-data-v1`. Se o conteúdo principal estiver
+corrompido, a gravação automática é suspensa e o sistema exibe um aviso para evitar
+que o dado original seja sobrescrito.
+
+Para transferir os dados entre navegadores, use **Configurações > Exportar backup**
+e depois **Importar backup**. O arquivo é validado antes da substituição dos dados.
+
+## Fluxo operacional
+
+1. Cadastre ou importe o chamado.
+2. Planeje técnico e data no Planner ou em Montar rota.
+3. Salve como rascunho ou confirme a rota.
+4. Consulte o Mapa de rotas; pontos sem coordenadas ficam listados sem interromper o mapa.
+5. Atualize o status do chamado conforme a execução.
+
+Alterações de rota, técnico, filial e chamado são refletidas nas demais telas por meio
+do estado centralizado e persistidas no navegador.
+
 ## Limitações
 
 - ainda não há backend, banco externo, login ou múltiplos usuários;
