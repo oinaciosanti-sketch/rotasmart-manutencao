@@ -71,6 +71,11 @@ mantida na chave `rotasmart-recovery-data-v1`. Se o conteúdo principal estiver
 corrompido, a gravação automática é suspensa e o sistema exibe um aviso para evitar
 que o dado original seja sobrescrito.
 
+Na migração de filiais, coordenadas locais válidas são preservadas e coordenadas
+numéricas salvas como texto são convertidas. Quando o navegador contém latitude ou
+longitude vazia/inválida, o sistema recupera automaticamente a coordenada válida da
+base atual, sem apagar as demais alterações locais da filial.
+
 Para transferir os dados entre navegadores, use **Configurações > Exportar backup**
 e depois **Importar backup**. O arquivo é validado antes da substituição dos dados.
 
