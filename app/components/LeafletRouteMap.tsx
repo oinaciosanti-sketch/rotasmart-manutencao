@@ -22,6 +22,7 @@ export type LeafletStop = {
   status?: string;
   order?: number;
   urgency?: string;
+  analyst?: string;
   latitude?: number | null;
   longitude?: number | null;
 };
@@ -150,6 +151,7 @@ export default function LeafletRouteMap({ routes }: { routes: LeafletRoute[] }) 
                       </span>
                       <span>Status: {stop.status || "Não informado"}</span>
                       <span>Urgência: {stop.urgency || "Não informada"}</span>
+                      <span>Analista: {stop.analyst || "Não definido"}</span>
                     </div>
                   </Popup>
                 </CircleMarker>

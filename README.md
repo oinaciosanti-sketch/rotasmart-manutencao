@@ -85,6 +85,24 @@ e depois **Importar backup**. O arquivo é validado antes da substituição dos 
 Alterações de rota, técnico, filial e chamado são refletidas nas demais telas por meio
 do estado centralizado e persistidas no navegador.
 
+## Analistas e Dashboard
+
+A aba **Analistas** mantém registros completos, com status ativo/inativo, contato,
+setor, cor, iniciais e observações. O vínculo do chamado utiliza nome e ID; renomear
+um analista atualiza os chamados relacionados, e excluir reatribui esses chamados
+para **Não definido**. Analistas encontrados na importação CSV são cadastrados
+automaticamente como ativos.
+
+O gráfico de rosca de **Rotas da semana** é um SVG calculado em tempo real. Cada
+setor usa a quantidade real de rotas confirmadas, em rascunho, em andamento,
+concluídas ou canceladas da semana atual e respeita os filtros do Dashboard. Não há
+percentuais fixos no CSS. Quando não existem rotas, o gráfico é substituído por um
+estado vazio.
+
+Backups novos usam a versão 2 do formato e incluem os registros completos de
+analistas e os vínculos dos chamados. Backups anteriores continuam aceitos e são
+migrados durante a importação.
+
 ## Limitações
 
 - ainda não há backend, banco externo, login ou múltiplos usuários;
