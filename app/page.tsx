@@ -7,7 +7,7 @@ import {
   Check, ChevronDown, ChevronRight, CircleHelp, Clock3, Download, FileSpreadsheet,
   Filter, GripVertical, Headphones, LayoutDashboard, Lightbulb, ListFilter, Map,
   MapPin, Menu, MoreHorizontal, Plus, Route, Search, Settings, SlidersHorizontal,
-  Pencil, Sparkles, TicketCheck, Trash2, UploadCloud, UserRound, Users, Wrench, X
+  Pencil, Sparkles, TicketCheck, Trash2, UploadCloud, UserRound, Users, Wrench, X, LogOut
 } from "lucide-react";
 import { Filial, branchNumberFromCnpj, cidadesFiliais, filiais as filiaisBase } from "./data/filiais";
 import { calculateDistanceKm, calculateRouteDistance, getValidRoutePoints, isValidCoordinate } from "./utils/distance";
@@ -15,6 +15,8 @@ import RouteErrorBoundary from "./components/RouteErrorBoundary";
 import { AGRICOPEL_BASE, AppDataProvider, validateBackup, useAppData } from "./data/AppDataContext";
 import type {AppAnalyst,AppTicket,AppTechnician,BackupMode,BackupPayload,RouteStartPoint,TicketStatus} from "./data/AppDataContext";
 import ImportTickets from "./components/ImportTickets";
+import CloudMigrationPanel from "./components/CloudMigrationPanel";
+import { AuthLoading, LoginScreen, useAuth } from "./components/AuthProvider";
 const LeafletRouteMap=dynamic(()=>import("./components/LeafletRouteMap"),{ssr:false,loading:()=><div className="map-loading">Carregando mapa OpenStreetMap…</div>});
 
 type Status = TicketStatus;
@@ -47,11 +49,13 @@ const menu: {label:Page; icon:any}[] = [
   {label:"Analistas",icon:UserRound},{label:"Técnicos",icon:Users},{label:"Importar chamados",icon:UploadCloud},
 ];
 
-export default function App(){return <AppDataProvider initialTickets={tickets} initialTechnicians={techs} initialBranches={filiaisBase}><AppShell/></AppDataProvider>}
+export default function App(){const auth=useAuth();if(auth.loading)return <AuthLoading/>;if(auth.configured&&!auth.user)return <LoginScreen/>;return <AppDataProvider initialTickets={tickets} initialTechnicians={techs} initialBranches={filiaisBase} cloudEnabled={auth.dataMode==="cloud"} cloudWritable={auth.profile?.role!=="visualizador"}><AppShell/></AppDataProvider>}
 function AppShell() {
   const [page,setPage]=useState<Page>("Dashboard");
   const [search,setSearch]=useState("");
-  const {tickets:appTickets,setTickets:setAppTickets,persistenceError,clearLocalData}=useAppData();
+  const {tickets:appTickets,setTickets:setAppTickets,persistenceError,cloudStatus,clearLocalData}=useAppData();
+  const {configured,user,profile,dataMode,signOut}=useAuth();
+  const userName=profile?.nome||user?.email?.split("@")[0]||"Inácio Carvalho";const userInitials=userName.split(/\s+/).slice(0,2).map(part=>part[0]).join("").toUpperCase();
   const [toast,setToast]=useState("");
   const flash=(s:string)=>{setToast(s);setTimeout(()=>setToast(""),2600)};
   const openGlobalSearch=(value:string)=>{setSearch(value);if(value.trim())setPage("Chamados")};
@@ -60,12 +64,13 @@ function AppShell() {
       <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>MANUTENÇÃO</span></div></div>
       <nav>{menu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>setPage(label)}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
       <div className="side-bottom"><button onClick={()=>setPage("Configurações")}><CircleHelp size={18}/>Configurações e backup</button><button onClick={clearLocalData}><Settings size={18}/>Limpar dados locais</button>
-        <div className="profile"><div className="avatar">IC</div><div><b>Inácio Carvalho</b><span>Analista de operações</span></div><MoreHorizontal size={18}/></div>
+        <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?(profile?.role||"analista"):"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>void signOut()} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
       </div>
     </aside>
     <main>
-      <header><div className="mobile-menu"><Menu/></div><div className="global-search"><Search size={18}/><input value={search} onChange={e=>openGlobalSearch(e.target.value)} placeholder="Buscar chamado, filial ou técnico..."/><kbd>⌘ K</kbd></div><div className="header-actions"><button><CircleHelp size={19}/></button><button className="notif"><Bell size={19}/><i/></button><div className="avatar small">IC</div></div></header>
+      <header><div className="mobile-menu"><Menu/></div><div className="global-search"><Search size={18}/><input value={search} onChange={e=>openGlobalSearch(e.target.value)} placeholder="Buscar chamado, filial ou técnico..."/><kbd>⌘ K</kbd></div><div className="header-actions"><span className={`data-mode-pill ${dataMode}`}>{dataMode==="cloud"?"Nuvem":"Local"}</span><button><CircleHelp size={19}/></button><button className="notif"><Bell size={19}/><i/></button><div className="avatar small">{userInitials}</div></div></header>
       <section className="content">
+        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Modo nuvem":"Modo local ativo"}</b><span>{dataMode==="cloud"?cloudStatus:"Os dados estão salvos apenas neste navegador. Configure o Supabase em Configurações para habilitar login e banco."}</span></div>
         {persistenceError&&<div className="persistence-banner"><AlertTriangle size={18}/><div><b>Atenção à persistência local</b><span>{persistenceError}</span></div></div>}
         {page==="Dashboard"&&<Dashboard go={setPage}/>}
         {page==="Chamados"&&<Kanban items={appTickets} setItems={setAppTickets} initialSearch={search} flash={flash}/>}
@@ -99,7 +104,7 @@ function SettingsPage({flash}:{flash:(message:string)=>void}){
  const readBackup=async(file?:File)=>{if(!file)return;try{const parsed:unknown=JSON.parse(await file.text());if(!validateBackup(parsed))throw new Error("Estrutura incompatível");setPreview(parsed);setError("")}catch{setPreview(null);setError("Arquivo inválido. Selecione um backup JSON gerado pelo RotaSmart.")}};
  const confirmImport=()=>{if(!preview)return;if(mode==="replace"&&!window.confirm("Substituir todos os dados atuais pelo backup selecionado?"))return;applyBackup(preview,mode);setPreview(null);flash(mode==="replace"?"Backup restaurado com sucesso":"Backup combinado com os dados atuais")};
  const addAnalyst=()=>{const value=newAnalyst.trim();if(!value||analysts.some(item=>normalizeText(item)===normalizeText(value)))return;setAnalysts(current=>[...current,value]);setNewAnalyst("");flash("Analista adicionado")};
- return <><PageHead title="Configurações e backup" sub="Proteja os dados locais e configure responsáveis pela operação."/><div className="settings-grid"><div className="panel settings-card"><h3>Backup completo</h3><p>Inclui chamados, técnicos, filiais, pontos de saída e analistas.</p><div className="settings-actions"><button className="btn primary" onClick={exportBackup}><Download size={16}/>Exportar JSON</button><button className="btn secondary" onClick={()=>input.current?.click()}><UploadCloud size={16}/>Importar backup</button><input ref={input} hidden type="file" accept=".json,application/json" onChange={event=>readBackup(event.target.files?.[0])}/></div>{error&&<p className="warning-text"><AlertTriangle size={15}/>{error}</p>}{preview&&<div className="backup-preview"><b>Prévia do backup</b><span>{preview.tickets.length} chamados · {preview.technicians.length} técnicos · {preview.branches.length} filiais</span><label><input type="radio" checked={mode==="merge"} onChange={()=>setMode("merge")}/>Combinar sem apagar os dados atuais</label><label><input type="radio" checked={mode==="replace"} onChange={()=>setMode("replace")}/>Substituir toda a base atual</label><div><button className="btn secondary" onClick={()=>setPreview(null)}>Cancelar</button><button className="btn primary" onClick={confirmImport}>Confirmar importação</button></div></div>}</div><div className="panel settings-card"><h3>Analistas responsáveis</h3><p>Lista usada no cadastro e nos filtros gerenciais.</p><div className="analyst-list">{analysts.map(analyst=><span key={analyst}>{analyst}<button aria-label={`Remover ${analyst}`} onClick={()=>setAnalysts(current=>current.filter(item=>item!==analyst))}><X size={13}/></button></span>)}</div><div className="inline-add"><input value={newAnalyst} onChange={e=>setNewAnalyst(e.target.value)} placeholder="Nome do analista"/><button className="btn primary" onClick={addAnalyst}><Plus size={15}/>Adicionar</button></div></div><div className="panel settings-card"><h3>Resumo local</h3><p>Dados persistidos neste navegador.</p><div className="summary-grid"><div><span>Chamados</span><b>{tickets.length}</b></div><div><span>Técnicos</span><b>{technicians.length}</b></div><div><span>Filiais</span><b>{branches.length}</b></div><div><span>Analistas</span><b>{analysts.length}</b></div></div></div></div></>
+ return <><PageHead title="Configurações e backup" sub="Proteja os dados locais e configure responsáveis pela operação."/><CloudMigrationPanel/><div className="settings-grid"><div className="panel settings-card"><h3>Backup completo</h3><p>Inclui chamados, técnicos, filiais, pontos de saída e analistas.</p><div className="settings-actions"><button className="btn primary" onClick={exportBackup}><Download size={16}/>Exportar JSON</button><button className="btn secondary" onClick={()=>input.current?.click()}><UploadCloud size={16}/>Importar backup</button><input ref={input} hidden type="file" accept=".json,application/json" onChange={event=>readBackup(event.target.files?.[0])}/></div>{error&&<p className="warning-text"><AlertTriangle size={15}/>{error}</p>}{preview&&<div className="backup-preview"><b>Prévia do backup</b><span>{preview.tickets.length} chamados · {preview.technicians.length} técnicos · {preview.branches.length} filiais</span><label><input type="radio" checked={mode==="merge"} onChange={()=>setMode("merge")}/>Combinar sem apagar os dados atuais</label><label><input type="radio" checked={mode==="replace"} onChange={()=>setMode("replace")}/>Substituir toda a base atual</label><div><button className="btn secondary" onClick={()=>setPreview(null)}>Cancelar</button><button className="btn primary" onClick={confirmImport}>Confirmar importação</button></div></div>}</div><div className="panel settings-card"><h3>Analistas responsáveis</h3><p>Lista usada no cadastro e nos filtros gerenciais.</p><div className="analyst-list">{analysts.map(analyst=><span key={analyst}>{analyst}<button aria-label={`Remover ${analyst}`} onClick={()=>setAnalysts(current=>current.filter(item=>item!==analyst))}><X size={13}/></button></span>)}</div><div className="inline-add"><input value={newAnalyst} onChange={e=>setNewAnalyst(e.target.value)} placeholder="Nome do analista"/><button className="btn primary" onClick={addAnalyst}><Plus size={15}/>Adicionar</button></div></div><div className="panel settings-card"><h3>Resumo local</h3><p>Dados persistidos neste navegador.</p><div className="summary-grid"><div><span>Chamados</span><b>{tickets.length}</b></div><div><span>Técnicos</span><b>{technicians.length}</b></div><div><span>Filiais</span><b>{branches.length}</b></div><div><span>Analistas</span><b>{analysts.length}</b></div></div></div></div></>
 }
 
 function Analysts({flash}:{flash:(message:string)=>void}){

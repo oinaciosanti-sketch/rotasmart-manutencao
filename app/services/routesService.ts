@@ -1,0 +1,10 @@
+import type { RouteRow,RouteStopRow } from "../types/database";
+import { requireSupabaseBrowserClient } from "../lib/supabase/client";
+export type RouteInput=Partial<Omit<RouteRow,"id"|"created_at"|"updated_at">>&{technician_id:string;route_date:string;status:string};
+export async function listRoutes(dateFrom?:string,dateTo?:string){let query=requireSupabaseBrowserClient().from("routes").select("*").order("route_date");if(dateFrom)query=query.gte("route_date",dateFrom);if(dateTo)query=query.lte("route_date",dateTo);const {data,error}=await query;if(error)throw error;return data as RouteRow[]}
+export async function getRouteById(id:string){const {data,error}=await requireSupabaseBrowserClient().from("routes").select("*").eq("id",id).single();if(error)throw error;return data as RouteRow}
+export async function createRoute(input:RouteInput){const {data,error}=await requireSupabaseBrowserClient().from("routes").insert(input).select().single();if(error)throw error;return data as RouteRow}
+export async function updateRouteRecord(id:string,input:Partial<RouteInput>){const {data,error}=await requireSupabaseBrowserClient().from("routes").update(input).eq("id",id).select().single();if(error)throw error;return data as RouteRow}
+export async function removeRoute(id:string){const {error}=await requireSupabaseBrowserClient().from("routes").delete().eq("id",id);if(error)throw error}
+export async function listRouteStops(routeId:string){const {data,error}=await requireSupabaseBrowserClient().from("route_stops").select("*").eq("route_id",routeId).order("stop_order");if(error)throw error;return data as RouteStopRow[]}
+export async function replaceRouteStops(routeId:string,stops:Array<Pick<RouteStopRow,"ticket_id"|"stop_order"|"latitude"|"longitude">>){const client=requireSupabaseBrowserClient();const removed=await client.from("route_stops").delete().eq("route_id",routeId);if(removed.error)throw removed.error;if(!stops.length)return[];const {data,error}=await client.from("route_stops").insert(stops.map(stop=>({...stop,route_id:routeId}))).select();if(error)throw error;return data as RouteStopRow[]}

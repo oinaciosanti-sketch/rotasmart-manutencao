@@ -1,5 +1,6 @@
 export type Filial = {
   id: number;
+  cloudId?: string;
   numeroFilial: string;
   nome: string;
   cidade: string;

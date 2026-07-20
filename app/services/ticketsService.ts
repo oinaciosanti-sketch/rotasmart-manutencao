@@ -1,0 +1,13 @@
+import type { TicketRow } from "../types/database";
+import { requireSupabaseBrowserClient } from "../lib/supabase/client";
+
+export type TicketFilters={status?:string;analystId?:string;technicianId?:string;plannedDate?:string};
+export type TicketInput=Partial<Omit<TicketRow,"id"|"created_at"|"updated_at">>&{ticket_number:string;description:string;status:string;urgency:string};
+export async function listTickets(filters:TicketFilters={}){let query=requireSupabaseBrowserClient().from("tickets").select("*").order("created_at",{ascending:false});if(filters.status)query=query.eq("status",filters.status);if(filters.analystId)query=query.eq("analyst_id",filters.analystId);if(filters.technicianId)query=query.eq("technician_id",filters.technicianId);if(filters.plannedDate)query=query.eq("planned_date",filters.plannedDate);const {data,error}=await query;if(error)throw error;return data as TicketRow[]}
+export async function getTicketById(id:string){const {data,error}=await requireSupabaseBrowserClient().from("tickets").select("*").eq("id",id).single();if(error)throw error;return data as TicketRow}
+export async function createTicketRecord(input:TicketInput){const {data,error}=await requireSupabaseBrowserClient().from("tickets").insert(input).select().single();if(error)throw error;return data as TicketRow}
+export async function updateTicketRecord(id:string,input:Partial<TicketInput>){const {data,error}=await requireSupabaseBrowserClient().from("tickets").update(input).eq("id",id).select().single();if(error)throw error;return data as TicketRow}
+export async function cancelTicketRecord(id:string){return updateTicketRecord(id,{status:"Cancelado",planning_status:"nao_planejado",route_id:null,route_order:null})}
+export async function deleteTicketRecord(id:string){const {error}=await requireSupabaseBrowserClient().from("tickets").delete().eq("id",id);if(error)throw error}
+export async function assignTicketToRoute(ticketId:string,routeId:string,order:number){return updateTicketRecord(ticketId,{route_id:routeId,route_order:order,planning_status:"rota_confirmada",status:"Programado"})}
+export async function removeTicketFromRoute(ticketId:string){return updateTicketRecord(ticketId,{route_id:null,route_order:null,planning_status:"nao_planejado"})}
