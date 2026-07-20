@@ -1,5 +1,71 @@
 # RotaSmart Manutenção
 
+## RotaSmart 2.0 — Supabase e login
+
+Esta versão inicia a transição do armazenamento local para uma arquitetura com
+autenticação e PostgreSQL no Supabase. O modo local continua disponível: sem as
+variáveis do Supabase, o aplicativo abre normalmente e mantém os dados no
+`localStorage`. Com as variáveis configuradas, o login passa a proteger o app e os
+dados são carregados e sincronizados com a nuvem.
+
+### O que foi incluído
+
+- login, cadastro, recuperação de senha, logout e restauração de sessão;
+- perfil com papéis `admin`, `analista` e `visualizador`;
+- cliente Supabase para navegador, servidor e renovação de sessão via middleware;
+- schema PostgreSQL para perfis, analistas, técnicos, filiais, chamados, rotas,
+  paradas e configurações;
+- políticas RLS separadas e sem uso de `service_role` no frontend;
+- serviços de acesso ao banco por entidade;
+- carregamento gradual do banco para o estado global;
+- sincronização cloud após a migração inicial;
+- tela de status e migração em **Configurações e backup**;
+- relatório de registros criados, atualizados, ignorados e com erro;
+- preservação integral do backup local depois da migração.
+
+### Criar e configurar o Supabase
+
+1. Crie um projeto em [supabase.com](https://supabase.com).
+2. Abra **SQL Editor** e execute primeiro `supabase/schema.sql`.
+3. Em seguida, execute `supabase/policies.sql` para habilitar RLS e permissões.
+4. Em **Project Settings > API**, copie a URL do projeto e a chave pública
+   `anon`/`publishable`.
+5. Copie `.env.example` para `.env.local` e preencha:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://SEU-PROJETO.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_CHAVE_PUBLICA
+```
+
+Nunca coloque a chave `service_role` em `.env.local`, no GitHub ou no navegador.
+
+### Configurar autenticação
+
+Em **Authentication > URL Configuration**, informe a URL pública da aplicação em
+**Site URL**. Adicione também `http://localhost:3000` e a URL da Vercel às URLs de
+redirecionamento permitidas. O primeiro usuário criado depois da execução do schema
+recebe o papel `admin`; os seguintes recebem `analista`. Confirme o e-mail se essa
+opção estiver habilitada no Supabase.
+
+### Migrar dados locais para o banco
+
+1. Entre no RotaSmart com o perfil `admin`.
+2. Abra **Configurações e backup**.
+3. Confira o estado **Banco conectado e sessão autenticada**.
+4. Clique em **Migrar dados locais para o banco**.
+5. Revise o resumo e confirme.
+
+A ordem é analistas, técnicos, filiais, rotas, chamados e paradas. Chamados são
+comparados por número; filiais por CNPJ ou número; técnicos e analistas por nome.
+O aplicativo não apaga o `localStorage` e exibe um relatório ao terminar.
+
+### Serviços de banco
+
+Chamadas Supabase ficam em `app/services`, separadas das telas. Os serviços de
+analistas, técnicos, filiais, chamados, rotas e perfis oferecem listagem, consulta,
+criação, atualização e remoção/desativação. `migration.ts` faz conversão, deduplicação,
+migração e carregamento do snapshot cloud.
+
 ## MVP 1.6
 
 - Base Agricopel de Jaraguá do Sul configurada como origem padrão em `-26.459964, -49.039587` para Wagner, Vinícius e Valdemir, preservando pontos personalizados.
@@ -56,7 +122,15 @@ pnpm start
 2. Na Vercel, selecione **Add New > Project**.
 3. Importe o repositório e confirme o framework **Next.js**.
 4. A Vercel usará `vercel.json` para instalar com pnpm e executar o build.
-5. Clique em **Deploy**.
+5. Em **Project Settings > Environment Variables**, cadastre
+   `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` para Production,
+   Preview e Development.
+6. Clique em **Deploy**.
+
+Se a Vercel informar `Can't resolve '@supabase/ssr'`, confirme que o commit enviado
+contém o `package.json` e o `pnpm-lock.yaml` desta versão. Depois use **Redeploy** com
+**Use existing Build Cache** desmarcado. O `vercel.json` também força uma instalação
+completa para evitar reutilização de dependências antigas.
 
 A URL pública gerada pela Vercel funciona sem depender de localhost.
 
@@ -116,9 +190,13 @@ migrados durante a importação.
 
 ## Limitações
 
-- ainda não há backend, banco externo, login ou múltiplos usuários;
-- dados salvos em um navegador não são compartilhados com outro dispositivo;
+- o enforcement dos papéis está principalmente no RLS; a interface ainda não oculta
+  todas as ações de administração para cada papel;
+- a sincronização desta etapa usa snapshots e não Supabase Realtime;
+- conflitos simultâneos entre vários analistas usam a última atualização recebida;
+- alterações feitas antes da primeira migração continuam somente no navegador;
 - a linha do mapa é aproximada e não segue ruas ou rodovias;
 - não há integração real com Movidesk ou API paga de roteamento;
+- ainda não há anexos, notificações ou auditoria avançada;
 - exclusões definitivas não mantêm histórico; para histórico operacional, use
   preferencialmente **Cancelar chamado**.
