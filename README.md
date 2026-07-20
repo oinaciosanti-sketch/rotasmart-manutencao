@@ -93,11 +93,11 @@ um analista atualiza os chamados relacionados, e excluir reatribui esses chamado
 para **Não definido**. Analistas encontrados na importação CSV são cadastrados
 automaticamente como ativos.
 
-O gráfico de rosca de **Rotas da semana** é um SVG calculado em tempo real. Cada
-setor usa a quantidade real de rotas confirmadas, em rascunho, em andamento,
-concluídas ou canceladas da semana atual e respeita os filtros do Dashboard. Não há
-percentuais fixos no CSS. Quando não existem rotas, o gráfico é substituído por um
-estado vazio.
+O gráfico de rosca de **Chamados por classe** é um SVG calculado em tempo real. Os
+setores agrupam os dados reais em **Novo**, **Em andamento** (Programado, Aguardando
+compra, Aguardando entrega e Em atendimento), **Concluídos** (Concluído e Fechado)
+e **Cancelados**. O gráfico respeita os filtros do Dashboard, não usa percentuais
+fixos e apresenta um estado vazio quando não há chamados nos filtros atuais.
 
 Backups novos usam a versão 2 do formato e incluem os registros completos de
 analistas e os vínculos dos chamados. Backups anteriores continuam aceitos e são
