@@ -22,7 +22,7 @@ export type Filial = {
 
 // Base inicial importada da aba "Coordenadas" da planilha fornecida.
 // Coordenadas fora dos limites geográficos são mantidas como nulas.
-export const initialBranches: Filial[] = [
+const rawInitialBranches: Filial[] = [
   {
     "id": 1,
     "numeroFilial": "01",
@@ -1410,6 +1410,23 @@ export const initialBranches: Filial[] = [
     "observacoes": ""
   }
 ];
+
+/**
+ * A Agricopel identifica a filial pelo número do estabelecimento do CNPJ
+ * menos um: 0068-10 => filial 67, 0060-63 => filial 59.
+ */
+export function branchNumberFromCnpj(cnpj: string): string | null {
+  const digits = String(cnpj || "").replace(/\D/g, "");
+  if (digits.length !== 14) return null;
+  const establishment = Number(digits.slice(8, 12));
+  if (!Number.isInteger(establishment) || establishment < 1) return null;
+  return String(establishment - 1).padStart(2, "0");
+}
+
+export const initialBranches: Filial[] = rawInitialBranches.map((branch) => ({
+  ...branch,
+  numeroFilial: branchNumberFromCnpj(branch.cnpj) ?? branch.numeroFilial,
+}));
 
 export const filiais = initialBranches;
 export const cidadesFiliais = Array.from(new Set(initialBranches.map((branch) => branch.cidade).filter(Boolean))).sort();

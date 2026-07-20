@@ -76,6 +76,12 @@ numéricas salvas como texto são convertidas. Quando o navegador contém latitu
 longitude vazia/inválida, o sistema recupera automaticamente a coordenada válida da
 base atual, sem apagar as demais alterações locais da filial.
 
+O número operacional da filial é calculado automaticamente a partir do CNPJ da
+Agricopel: o número do estabelecimento (os quatro dígitos antes do hífen) menos
+um. Exemplos: `0068-10` corresponde à filial `67` e `0060-63` à filial `59`.
+Na abertura do app, vínculos antigos de chamados também são migrados para o novo
+número sem perder coordenadas, rotas ou demais dados salvos no navegador.
+
 Para transferir os dados entre navegadores, use **Configurações > Exportar backup**
 e depois **Importar backup**. O arquivo é validado antes da substituição dos dados.
 
