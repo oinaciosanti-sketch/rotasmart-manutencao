@@ -124,6 +124,13 @@ export function AuthLoading() {
 
 export function AccessStatusScreen(){const {profile,signOut}=useAuth();const status=profile?.status||"pendente";const message=status==="pendente"?"Seu acesso está aguardando aprovação de um administrador.":status==="bloqueado"?"Acesso bloqueado. Fale com um administrador.":"Seu usuário está inativo. Fale com um administrador.";return <main className="auth-page"><section className="auth-brand"><div className="auth-logo"><Route/></div><span>ROTASMART 2.2</span><h1>Acesso temporariamente indisponível.</h1><p>{message}</p></section><section className="auth-panel"><div className="auth-card"><div className="auth-message error"><AlertTriangle/>{message}</div><button className="btn primary auth-submit" onClick={()=>void signOut()}>Voltar ao login</button></div></section></main>}
 
+function readableAuthError(reason:unknown,mode:"login"|"signup"|"reset"){
+ const item=reason as {message?:unknown;error_description?:unknown;msg?:unknown;code?:unknown};const raw=[item?.message,item?.error_description,item?.msg].find(value=>typeof value==="string"&&value.trim()) as string|undefined;
+ if(raw&&raw!=="{}")return raw;
+ if(mode==="signup")return "Não foi possível criar a conta. Verifique se o e-mail já existe e se o hotfix SQL de cadastro foi executado no Supabase.";
+ return "Não foi possível concluir a autenticação. Tente novamente.";
+}
+
 export function LoginScreen() {
   const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
   const [name, setName] = useState("");
@@ -154,7 +161,7 @@ export function LoginScreen() {
         setMessage("Enviamos as instruções de recuperação para o seu e-mail.");
       }
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Não foi possível concluir a autenticação.");
+      setError(readableAuthError(reason,mode));
     } finally {
       setBusy(false);
     }

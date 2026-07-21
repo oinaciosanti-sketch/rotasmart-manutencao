@@ -41,8 +41,7 @@ begin
   else
     if exists(select 1 from public.profiles where user_id is not null) then assigned_role:='visualizador';assigned_status:='pendente'; else assigned_role:='admin';assigned_status:='ativo'; end if;
     insert into public.profiles(id,user_id,nome,email,role,status,ativo,created_by,updated_by,last_sign_in_at)
-    values(gen_random_uuid(),new.id,coalesce(new.raw_user_meta_data->>'nome',split_part(new.email,'@',1)),coalesce(new.email,''),assigned_role,assigned_status,assigned_status='ativo',new.id,new.id,now())
-    on conflict(user_id) do update set last_sign_in_at=now(),updated_at=now();
+    values(gen_random_uuid(),new.id,coalesce(new.raw_user_meta_data->>'nome',split_part(new.email,'@',1)),coalesce(new.email,''),assigned_role,assigned_status,assigned_status='ativo',new.id,new.id,now());
   end if;
   return new;
 end $$;

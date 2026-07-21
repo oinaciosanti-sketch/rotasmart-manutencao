@@ -266,6 +266,12 @@ execute `supabase/hotfix_v2_2_admin_access.sql` no SQL Editor. O script religa
 reativa somente admins que ainda possuem `ativo=true` e recarrega o cache do
 PostgREST. Depois, saia e entre novamente no RotaSmart.
 
+Se o cadastro de uma conta nova apresentar `{}` ou **Database error saving new
+user**, execute `supabase/hotfix_v2_2_signup.sql`. Ele substitui o trigger de criação
+do profile e remove o uso incompatível de `ON CONFLICT(user_id)` sobre o índice
+parcial. Depois verifique em **Authentication > Users** se a tentativa anterior criou
+a conta: se existir, use o login; se não existir, repita o cadastro.
+
 O 2.2 adiciona o papel `tecnico`, aprovação obrigatória de novos cadastros, vínculo
 usuário–técnico e um portal mobile para execução das rotas. Para atualizar um banco
 2.1 existente, execute no SQL Editor do Supabase, nesta ordem:
