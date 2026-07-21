@@ -55,7 +55,7 @@ begin
   select * into result from public.profiles where user_id=auth.uid() limit 1;
   if found then update public.profiles set last_sign_in_at=now() where id=result.id returning * into result;return result;end if;
   update public.profiles set user_id=auth.uid(),last_sign_in_at=now(),updated_at=now(),updated_by=auth.uid()
-  where id=(select id from public.profiles where lower(email)=lower(auth_email) and user_id is null order by created_at limit 1) returning * into result;
+  where id=(select id from public.profiles where lower(email)=lower(auth_email) and (user_id is null or user_id<>auth.uid()) order by created_at limit 1) returning * into result;
   if found then return result;end if;
   if not exists(select 1 from public.profiles where user_id is not null) then
     insert into public.profiles(user_id,nome,email,role,status,ativo,created_by,updated_by,last_sign_in_at) values(auth.uid(),split_part(auth_email,'@',1),auth_email,'admin','ativo',true,auth.uid(),auth.uid(),now()) returning * into result;

@@ -258,6 +258,14 @@ faça novo login para validar o bloqueio.
 
 ## RotaSmart 2.2 — aprovação e Portal do Técnico
 
+### Hotfix de acesso administrativo
+
+Se um administrador existente aparecer incorretamente como **aguardando aprovação**,
+execute `supabase/hotfix_v2_2_admin_access.sql` no SQL Editor. O script religa
+`profiles.user_id` ao usuário do Supabase Auth pelo e-mail exato, mantém a role atual,
+reativa somente admins que ainda possuem `ativo=true` e recarrega o cache do
+PostgREST. Depois, saia e entre novamente no RotaSmart.
+
 O 2.2 adiciona o papel `tecnico`, aprovação obrigatória de novos cadastros, vínculo
 usuário–técnico e um portal mobile para execução das rotas. Para atualizar um banco
 2.1 existente, execute no SQL Editor do Supabase, nesta ordem:

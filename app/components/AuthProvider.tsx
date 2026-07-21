@@ -45,14 +45,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const client = getSupabaseBrowserClient();
     if (!client) return;
-    // The RPC links a pre-created pending profile by e-mail and records the last access.
-    // Older 2.0 databases may not have it yet, so the profile query still has a safe fallback.
-    await client.rpc("claim_my_pending_profile");
-    let result: any = await client.from("profiles").select("id,user_id,nome,email,role,analyst_id,technician_id,ativo,status,analysts(name),technicians(name)").eq("user_id", currentUser.id).maybeSingle();
-    if(result.error&&result.error.code==="42703")result=await client.from("profiles").select("id,nome,email,role,analyst_id,ativo").eq("id",currentUser.id).maybeSingle();
+    // Avoid nested PostgREST relationships here: a stale schema cache must never turn
+    // a real admin into the visual "pending" fallback.
+    const claimed: any = await client.rpc("claim_my_pending_profile");
+    let result: any = await client.from("profiles").select("*").eq("user_id", currentUser.id).maybeSingle();
+    if(result.error?.code==="42703")result=await client.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
+    if(!result.data&&claimed.data)result={data:claimed.data,error:null};
+    if(!result.data)result=await client.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
     const data=result.data as any;
+    let analystName:string|null=null,technicianName:string|null=null;
+    if(data?.analyst_id){const analyst=await client.from("analysts").select("name").eq("id",data.analyst_id).maybeSingle();analystName=analyst.data?.name||null}
+    if(data?.technician_id){const technician=await client.from("technicians").select("name").eq("id",data.technician_id).maybeSingle();technicianName=technician.data?.name||null}
     setProfile(
-      data ? {...data,analystName:data.analysts?.name||null,technicianName:data.technicians?.name||null} : {
+      data ? {...data,analystName,technicianName} : {
         id: currentUser.id,
         nome: String(currentUser.user_metadata?.nome || currentUser.email?.split("@")[0] || "Usuário"),
         email: currentUser.email || "",
