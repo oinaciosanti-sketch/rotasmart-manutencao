@@ -16,4 +16,17 @@
 .technician-review-actions{display:flex;align-items:center;gap:10px}
 .technician-review-actions span{color:#68798a;font-size:10px}
 .map-technician-status{display:block;margin-top:5px;padding:4px 6px;border-radius:6px;font-weight:700}
+.tech-week-groups{display:grid;gap:14px}
+.tech-week-day{overflow:hidden;border:1px solid #dfe6ec;border-radius:14px;background:#fff}
+.tech-week-day>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid #edf1f5;background:#f8fafc}
+.tech-week-day>header div{display:flex;align-items:baseline;gap:8px}
+.tech-week-day>header b{text-transform:capitalize;color:#263b50;font-size:13px}
+.tech-week-day>header span,.tech-week-day>header small{color:#728296;font-size:9px}
+.tech-week-day>header small{padding:4px 7px;border-radius:999px;background:#eaf0f6;font-weight:700;white-space:nowrap}
+.tech-week-day.today{border-color:#8bb5ff;box-shadow:0 0 0 2px #dbe9ff}
+.tech-week-day.today>header{background:#edf4ff}
+.tech-week-day.today>header b,.tech-week-day.today>header span{color:#245cc5}
+.tech-week-day .tech-route-list{gap:8px;padding:10px}
+.tech-week-day .tech-stop-card{box-shadow:none}
+.tech-day-empty{padding:18px 14px;color:#7a8998;font-size:10px;text-align:center}
 @media (max-width:640px){.technician-execution dl{grid-template-columns:1fr}.technician-execution dl .wide{grid-column:auto}.technician-execution-head,.technician-review-actions{align-items:stretch;flex-direction:column}}
