@@ -57,7 +57,8 @@ export async function migrateBackupToCloud(payload:BackupPayload,onProgress?:(me
 
 export async function loadCloudBackup():Promise<BackupPayload|null>{
   const client=requireSupabaseBrowserClient();
-  const [analystsResult,techniciansResult,branchesResult,ticketsResult,routesResult,routeStopsResult]=await Promise.all([client.from("analysts").select("*"),client.from("technicians").select("*"),client.from("branches").select("*"),client.from("tickets").select("*").eq("active",true).is("deleted_at",null),client.from("routes").select("*"),client.from("route_stops").select("ticket_id,route_id,stop_order")]);
+  const ticketsRequest=(async()=>{const filtered=await client.from("tickets").select("*").eq("active",true).is("deleted_at",null);if(filtered.error?.code==="42703"||filtered.error?.message?.includes("active")||filtered.error?.message?.includes("deleted_at"))return client.from("tickets").select("*");return filtered})();
+  const [analystsResult,techniciansResult,branchesResult,ticketsResult,routesResult,routeStopsResult]=await Promise.all([client.from("analysts").select("*"),client.from("technicians").select("*"),client.from("branches").select("*"),ticketsRequest,client.from("routes").select("*"),client.from("route_stops").select("ticket_id,route_id,stop_order")]);
   const error=analystsResult.error||techniciansResult.error||branchesResult.error||ticketsResult.error||routesResult.error||routeStopsResult.error;if(error)throw error;
   const analystRows=analystsResult.data||[],technicianRows=techniciansResult.data||[],branchRows=branchesResult.data||[],ticketRows=ticketsResult.data||[],routeRows=routesResult.data||[],routeStopRows=routeStopsResult.data||[];const validRouteStops=new Map(routeStopRows.map(stop=>[stop.ticket_id,stop]));
   if(!analystRows.length&&!technicianRows.length&&!branchRows.length&&!ticketRows.length)return null;
