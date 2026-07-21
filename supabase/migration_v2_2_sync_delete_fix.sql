@@ -77,6 +77,59 @@ alter table public.route_stops
   references public.tickets(id)
   on delete cascade;
 
+-- Exclusão lógica atômica. A função executa as duas alterações na mesma
+-- transação e não depende das policies de escrita aplicadas pelo navegador.
+create or replace function public.soft_delete_ticket(p_ticket_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  affected_ticket public.tickets;
+begin
+  if auth.uid() is null then
+    raise exception using errcode = '42501', message = 'Usuário não autenticado.';
+  end if;
+
+  if public.current_app_role() <> 'admin' then
+    raise exception using errcode = '42501', message = 'Somente administradores podem excluir chamados.';
+  end if;
+
+  delete from public.route_stops
+  where ticket_id = p_ticket_id;
+
+  update public.tickets
+  set active = false,
+      deleted_at = now(),
+      deleted_by = auth.uid(),
+      technician_id = null,
+      planned_date = null,
+      route_id = null,
+      route_order = null,
+      planning_status = 'nao_planejado',
+      updated_by = auth.uid(),
+      updated_at = now()
+  where id = p_ticket_id
+    and active = true
+    and deleted_at is null
+  returning * into affected_ticket;
+
+  if affected_ticket.id is null then
+    raise exception using errcode = 'P0002', message = 'Chamado não encontrado ou já excluído.';
+  end if;
+
+  return jsonb_build_object(
+    'id', affected_ticket.id,
+    'active', affected_ticket.active,
+    'deleted_at', affected_ticket.deleted_at
+  );
+end;
+$$;
+
+revoke all on function public.soft_delete_ticket(uuid) from public;
+grant execute on function public.soft_delete_ticket(uuid) to authenticated;
+
 commit;
 
 notify pgrst, 'reload schema';
