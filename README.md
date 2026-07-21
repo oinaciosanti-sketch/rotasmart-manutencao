@@ -200,3 +200,58 @@ migrados durante a importação.
 - ainda não há anexos, notificações ou auditoria avançada;
 - exclusões definitivas não mantêm histórico; para histórico operacional, use
   preferencialmente **Cancelar chamado**.
+
+## RotaSmart 2.1 — usuários e permissões
+
+Esta versão adiciona a aba **Usuários**, visível somente para administradores. Nela é
+possível criar um perfil pendente, editar nome e e-mail, escolher o papel
+(`admin`, `analista` ou `visualizador`), vincular um analista e ativar ou inativar o
+acesso. O frontend não usa `service_role` e não exclui contas do Supabase Auth.
+
+Antes de publicar a versão 2.1, execute **depois** dos scripts do RotaSmart 2.0:
+
+1. Abra **Supabase > SQL Editor**.
+2. Cole e execute o conteúdo de `supabase/policies_v2_1.sql`.
+3. Confirme que não houve erro e só então publique/recarregue o frontend.
+
+O script preserva os perfis existentes, acrescenta `user_id`, status, observações,
+último acesso e auditoria, e atualiza as políticas RLS. O primeiro usuário vinculado
+continua administrador. Contas seguintes sem perfil previamente criado recebem o
+papel mais seguro de visualizador.
+
+### Como adicionar um usuário
+
+1. Entre como administrador e abra **Usuários**.
+2. Clique em **Adicionar usuário**, informe o e-mail exato, papel e analista.
+3. Salve o perfil como **Pendente**.
+4. Peça ao usuário para criar a conta na tela de cadastro com exatamente o mesmo
+   e-mail. No primeiro acesso, o perfil pendente será vinculado automaticamente e
+   manterá o papel e o analista escolhidos pelo administrador.
+
+No cabeçalho são mostrados nome, papel e analista vinculado. Um perfil inativo recebe
+uma tela de acesso indisponível. As permissões também são validadas pelo RLS:
+
+- **admin:** administração completa, usuários, cadastros mestres, migração e backup;
+- **analista:** chamados, planejamento, rotas, Planner, mapa e importação operacional;
+- **visualizador:** consulta, sem criação, edição, exclusão ou confirmação de rotas.
+
+Chamados, rotas e perfis registram `created_by` e `updated_by`; analistas, técnicos e
+filiais também recebem auditoria durante gravações administrativas. Mesmo com o banco
+conectado, recomendamos exportar backup antes de grandes migrações.
+
+### Teste recomendado com outro usuário
+
+Crie um perfil pendente em uma janela de administrador. Em uma janela anônima,
+cadastre a conta com o mesmo e-mail e confirme que o papel e o analista foram
+herdados. Depois teste criação/edição de chamado como analista e confirme que um
+visualizador não vê os botões de alteração. Por fim, inative o perfil pelo admin e
+faça novo login para validar o bloqueio.
+
+### Limitações do 2.1
+
+- convites e exclusão de contas Auth ainda dependem de operação administrativa no
+  painel do Supabase;
+- permissões são deliberadamente amplas por papel, sem regras por filial ou equipe;
+- não há Realtime nem resolução automática de edições simultâneas;
+- testes completos com múltiplas contas exigem um projeto Supabase configurado e não
+  podem ser simulados apenas no build local.

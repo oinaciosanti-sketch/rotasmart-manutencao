@@ -7,11 +7,14 @@ import { getSupabaseBrowserClient, isSupabaseConfigured } from "../lib/supabase/
 
 export type UserProfile = {
   id: string;
+  user_id?: string | null;
   nome: string;
   email: string;
   role: "admin" | "analista" | "visualizador";
   analyst_id?: string | null;
+  analystName?: string | null;
   ativo: boolean;
+  status?: "ativo" | "pendente" | "inativo";
 };
 
 type AuthContextValue = {
@@ -40,16 +43,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const client = getSupabaseBrowserClient();
     if (!client) return;
-    const { data } = await client.from("profiles").select("id,nome,email,role,analyst_id,ativo").eq("id", currentUser.id).maybeSingle();
+    // The RPC links a pre-created pending profile by e-mail and records the last access.
+    // Older 2.0 databases may not have it yet, so the profile query still has a safe fallback.
+    await client.rpc("claim_my_pending_profile");
+    let result: any = await client.from("profiles").select("id,user_id,nome,email,role,analyst_id,ativo,status,analysts(name)").eq("user_id", currentUser.id).maybeSingle();
+    if(result.error&&result.error.code==="42703")result=await client.from("profiles").select("id,nome,email,role,analyst_id,ativo").eq("id",currentUser.id).maybeSingle();
+    const data=result.data as any;
     setProfile(
-      data || {
+      data ? {...data,analystName:data.analysts?.name||null} : {
         id: currentUser.id,
         nome: String(currentUser.user_metadata?.nome || currentUser.email?.split("@")[0] || "Usuário"),
         email: currentUser.email || "",
-        role: "analista",
+        role: "visualizador",
         analyst_id: null,
-        ativo: true,
-      },
+        ativo: true,status:"ativo",
+      } as UserProfile,
     );
   };
 
@@ -106,6 +114,8 @@ export function useAuth() {
 export function AuthLoading() {
   return <div className="auth-loading"><Loader2 className="spin"/><span>Verificando sessão segura…</span></div>;
 }
+
+export function InactiveAccount(){const {profile,signOut}=useAuth();return <main className="auth-page"><section className="auth-brand"><div className="auth-logo"><Route/></div><span>ROTASMART 2.1</span><h1>Acesso temporariamente indisponível.</h1><p>Seu perfil está inativo. Solicite a um administrador a reativação do acesso.</p></section><section className="auth-panel"><div className="auth-card"><div className="auth-message error"><AlertTriangle/>Perfil inativo: {profile?.email}</div><button className="btn primary auth-submit" onClick={()=>void signOut()}>Voltar ao login</button></div></section></main>}
 
 export function LoginScreen() {
   const [mode, setMode] = useState<"login" | "signup" | "reset">("login");

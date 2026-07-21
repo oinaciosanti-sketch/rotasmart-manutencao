@@ -7,7 +7,7 @@ import {
   Check, ChevronDown, ChevronRight, CircleHelp, Clock3, Download, FileSpreadsheet,
   Filter, GripVertical, Headphones, LayoutDashboard, Lightbulb, ListFilter, Map,
   MapPin, Menu, MoreHorizontal, Plus, Route, Search, Settings, SlidersHorizontal,
-  Pencil, Sparkles, TicketCheck, Trash2, UploadCloud, UserRound, Users, Wrench, X, LogOut
+  Pencil, Sparkles, TicketCheck, Trash2, UploadCloud, UserRound, Users, Wrench, X, LogOut, ShieldCheck
 } from "lucide-react";
 import { Filial, branchNumberFromCnpj, cidadesFiliais, filiais as filiaisBase } from "./data/filiais";
 import { calculateDistanceKm, calculateRouteDistance, getValidRoutePoints, isValidCoordinate } from "./utils/distance";
@@ -16,11 +16,13 @@ import { AGRICOPEL_BASE, AppDataProvider, validateBackup, useAppData } from "./d
 import type {AppAnalyst,AppTicket,AppTechnician,BackupMode,BackupPayload,RouteStartPoint,TicketStatus} from "./data/AppDataContext";
 import ImportTickets from "./components/ImportTickets";
 import CloudMigrationPanel from "./components/CloudMigrationPanel";
-import { AuthLoading, LoginScreen, useAuth } from "./components/AuthProvider";
+import UsersPage from "./components/UsersPage";
+import { AuthLoading, InactiveAccount, LoginScreen, useAuth } from "./components/AuthProvider";
+import {can,type AppRole} from "./lib/permissions";
 const LeafletRouteMap=dynamic(()=>import("./components/LeafletRouteMap"),{ssr:false,loading:()=><div className="map-loading">Carregando mapa OpenStreetMap…</div>});
 
 type Status = TicketStatus;
-type Page = "Dashboard" | "Chamados" | "Planner semanal" | "Montar rota" | "Mapa de rotas" | "Filiais / Postos" | "Analistas" | "Técnicos" | "Importar chamados" | "Configurações";
+type Page = "Dashboard" | "Chamados" | "Planner semanal" | "Montar rota" | "Mapa de rotas" | "Filiais / Postos" | "Analistas" | "Técnicos" | "Usuários" | "Importar chamados" | "Configurações";
 type Ticket = AppTicket;
 type Technician = AppTechnician;
 const relativeDate=(days:number)=>{const date=new Date();date.setHours(12,0,0,0);date.setDate(date.getDate()+days);return date.toISOString().slice(0,10)};
@@ -46,31 +48,32 @@ const techs: Technician[] = [
 const menu: {label:Page; icon:any}[] = [
   {label:"Dashboard",icon:LayoutDashboard},{label:"Chamados",icon:TicketCheck},{label:"Planner semanal",icon:CalendarDays},
   {label:"Montar rota",icon:Route},{label:"Mapa de rotas",icon:Map},{label:"Filiais / Postos",icon:Building2},
-  {label:"Analistas",icon:UserRound},{label:"Técnicos",icon:Users},{label:"Importar chamados",icon:UploadCloud},
+  {label:"Analistas",icon:UserRound},{label:"Técnicos",icon:Users},{label:"Usuários",icon:ShieldCheck},{label:"Importar chamados",icon:UploadCloud},
 ];
 
-export default function App(){const auth=useAuth();if(auth.loading)return <AuthLoading/>;if(auth.configured&&!auth.user)return <LoginScreen/>;return <AppDataProvider initialTickets={tickets} initialTechnicians={techs} initialBranches={filiaisBase} cloudEnabled={auth.dataMode==="cloud"} cloudWritable={auth.profile?.role!=="visualizador"}><AppShell/></AppDataProvider>}
+export default function App(){const auth=useAuth();if(auth.loading)return <AuthLoading/>;if(auth.configured&&!auth.user)return <LoginScreen/>;if(auth.configured&&auth.profile&&(!auth.profile.ativo||auth.profile.status==="inativo"))return <InactiveAccount/>;return <AppDataProvider initialTickets={tickets} initialTechnicians={techs} initialBranches={filiaisBase} cloudEnabled={auth.dataMode==="cloud"} cloudWritable={auth.profile?.role!=="visualizador"} role={auth.profile?.role||"admin"}><AppShell/></AppDataProvider>}
 function AppShell() {
   const [page,setPage]=useState<Page>("Dashboard");
   const [search,setSearch]=useState("");
   const {tickets:appTickets,setTickets:setAppTickets,persistenceError,cloudStatus,clearLocalData}=useAppData();
   const {configured,user,profile,dataMode,signOut}=useAuth();
+  const role:AppRole=profile?.role||(configured?"visualizador":"admin");const visibleMenu=menu.filter(item=>item.label!=="Usuários"||(configured&&can(role,"users.manage"))).filter(item=>item.label!=="Importar chamados"||can(role,"imports.run")).filter(item=>item.label!=="Montar rota"||can(role,"routes.create"));
   const userName=profile?.nome||user?.email?.split("@")[0]||"Inácio Carvalho";const userInitials=userName.split(/\s+/).slice(0,2).map(part=>part[0]).join("").toUpperCase();
   const [toast,setToast]=useState("");
   const flash=(s:string)=>{setToast(s);setTimeout(()=>setToast(""),2600)};
   const openGlobalSearch=(value:string)=>{setSearch(value);if(value.trim())setPage("Chamados")};
-  return <div className="app">
+  return <div className={`app role-${role}`}>
     <aside className="sidebar">
       <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>MANUTENÇÃO</span></div></div>
-      <nav>{menu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>setPage(label)}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
-      <div className="side-bottom"><button onClick={()=>setPage("Configurações")}><CircleHelp size={18}/>Configurações e backup</button><button onClick={clearLocalData}><Settings size={18}/>Limpar dados locais</button>
-        <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?(profile?.role||"analista"):"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>void signOut()} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
+      <nav>{visibleMenu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>setPage(label)}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
+      <div className="side-bottom"><button onClick={()=>setPage("Configurações")}><CircleHelp size={18}/>Configurações e backup</button>{can(role,"local.clear")&&<button onClick={clearLocalData}><Settings size={18}/>Limpar dados locais</button>}
+        <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>void signOut()} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
       </div>
     </aside>
     <main>
       <header><div className="mobile-menu"><Menu/></div><div className="global-search"><Search size={18}/><input value={search} onChange={e=>openGlobalSearch(e.target.value)} placeholder="Buscar chamado, filial ou técnico..."/><kbd>⌘ K</kbd></div><div className="header-actions"><span className={`data-mode-pill ${dataMode}`}>{dataMode==="cloud"?"Nuvem":"Local"}</span><button><CircleHelp size={19}/></button><button className="notif"><Bell size={19}/><i/></button><div className="avatar small">{userInitials}</div></div></header>
-      <section className="content">
-        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Modo nuvem":"Modo local ativo"}</b><span>{dataMode==="cloud"?cloudStatus:"Os dados estão salvos apenas neste navegador. Configure o Supabase em Configurações para habilitar login e banco."}</span></div>
+      <section className={`content page-${page.toLowerCase().replace(/[^a-z0-9]/g,"")}`}>
+        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Modo nuvem — Banco conectado":"Modo local"}</b><span>{dataMode==="cloud"?cloudStatus:"Modo local — dados salvos apenas neste navegador."}</span></div>
         {persistenceError&&<div className="persistence-banner"><AlertTriangle size={18}/><div><b>Atenção à persistência local</b><span>{persistenceError}</span></div></div>}
         {page==="Dashboard"&&<Dashboard go={setPage}/>}
         {page==="Chamados"&&<Kanban items={appTickets} setItems={setAppTickets} initialSearch={search} flash={flash}/>}
@@ -80,6 +83,7 @@ function AppShell() {
         {page==="Filiais / Postos"&&<Branches flash={flash}/>}
         {page==="Analistas"&&<Analysts flash={flash}/>}
         {page==="Técnicos"&&<Technicians flash={flash}/>}
+        {page==="Usuários"&&(can(role,"users.manage")?<UsersPage flash={flash}/>:<div className="panel restricted-page"><ShieldCheck/><h2>Acesso restrito</h2><p>Somente administradores podem acessar esta área.</p></div>)}
         {page==="Importar chamados"&&<ImportTickets flash={flash}/>} 
         {page==="Configurações"&&<SettingsPage flash={flash}/>} 
       </section>
@@ -99,11 +103,12 @@ function downloadFile(name:string,content:string,type:string){const url=URL.crea
 function downloadCsv(name:string,rows:(string|number|null|undefined)[][]){const csv=rows.map(row=>row.map(value=>`"${String(value??"").replace(/"/g,'""')}"`).join(";")).join("\n");downloadFile(name,"\uFEFF"+csv,"text/csv;charset=utf-8")}
 
 function SettingsPage({flash}:{flash:(message:string)=>void}){
+ const {configured,profile}=useAuth();const settingsRole:AppRole=profile?.role||(configured?"visualizador":"admin");
  const {tickets,technicians,branches,analysts,setAnalysts,createBackup,applyBackup}=useAppData();const input=useRef<HTMLInputElement>(null);const [preview,setPreview]=useState<BackupPayload|null>(null);const [mode,setMode]=useState<BackupMode>("merge");const [newAnalyst,setNewAnalyst]=useState("");const [error,setError]=useState("");
  const exportBackup=()=>{downloadFile(`rotasmart-backup-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(createBackup(),null,2),"application/json");flash("Backup exportado com sucesso")};
  const readBackup=async(file?:File)=>{if(!file)return;try{const parsed:unknown=JSON.parse(await file.text());if(!validateBackup(parsed))throw new Error("Estrutura incompatível");setPreview(parsed);setError("")}catch{setPreview(null);setError("Arquivo inválido. Selecione um backup JSON gerado pelo RotaSmart.")}};
- const confirmImport=()=>{if(!preview)return;if(mode==="replace"&&!window.confirm("Substituir todos os dados atuais pelo backup selecionado?"))return;applyBackup(preview,mode);setPreview(null);flash(mode==="replace"?"Backup restaurado com sucesso":"Backup combinado com os dados atuais")};
- const addAnalyst=()=>{const value=newAnalyst.trim();if(!value||analysts.some(item=>normalizeText(item)===normalizeText(value)))return;setAnalysts(current=>[...current,value]);setNewAnalyst("");flash("Analista adicionado")};
+ const confirmImport=()=>{if(!can(settingsRole,"backup.import")){setError("Apenas administradores podem importar backups.");return}if(!preview)return;if(mode==="replace"&&!window.confirm("Substituir todos os dados atuais pelo backup selecionado?"))return;applyBackup(preview,mode);setPreview(null);flash(mode==="replace"?"Backup restaurado com sucesso":"Backup combinado com os dados atuais")};
+ const addAnalyst=()=>{if(!can(settingsRole,"analysts.update")){setError("Apenas administradores podem alterar analistas.");return}const value=newAnalyst.trim();if(!value||analysts.some(item=>normalizeText(item)===normalizeText(value)))return;setAnalysts(current=>[...current,value]);setNewAnalyst("");flash("Analista adicionado")};
  return <><PageHead title="Configurações e backup" sub="Proteja os dados locais e configure responsáveis pela operação."/><CloudMigrationPanel/><div className="settings-grid"><div className="panel settings-card"><h3>Backup completo</h3><p>Inclui chamados, técnicos, filiais, pontos de saída e analistas.</p><div className="settings-actions"><button className="btn primary" onClick={exportBackup}><Download size={16}/>Exportar JSON</button><button className="btn secondary" onClick={()=>input.current?.click()}><UploadCloud size={16}/>Importar backup</button><input ref={input} hidden type="file" accept=".json,application/json" onChange={event=>readBackup(event.target.files?.[0])}/></div>{error&&<p className="warning-text"><AlertTriangle size={15}/>{error}</p>}{preview&&<div className="backup-preview"><b>Prévia do backup</b><span>{preview.tickets.length} chamados · {preview.technicians.length} técnicos · {preview.branches.length} filiais</span><label><input type="radio" checked={mode==="merge"} onChange={()=>setMode("merge")}/>Combinar sem apagar os dados atuais</label><label><input type="radio" checked={mode==="replace"} onChange={()=>setMode("replace")}/>Substituir toda a base atual</label><div><button className="btn secondary" onClick={()=>setPreview(null)}>Cancelar</button><button className="btn primary" onClick={confirmImport}>Confirmar importação</button></div></div>}</div><div className="panel settings-card"><h3>Analistas responsáveis</h3><p>Lista usada no cadastro e nos filtros gerenciais.</p><div className="analyst-list">{analysts.map(analyst=><span key={analyst}>{analyst}<button aria-label={`Remover ${analyst}`} onClick={()=>setAnalysts(current=>current.filter(item=>item!==analyst))}><X size={13}/></button></span>)}</div><div className="inline-add"><input value={newAnalyst} onChange={e=>setNewAnalyst(e.target.value)} placeholder="Nome do analista"/><button className="btn primary" onClick={addAnalyst}><Plus size={15}/>Adicionar</button></div></div><div className="panel settings-card"><h3>Resumo local</h3><p>Dados persistidos neste navegador.</p><div className="summary-grid"><div><span>Chamados</span><b>{tickets.length}</b></div><div><span>Técnicos</span><b>{technicians.length}</b></div><div><span>Filiais</span><b>{branches.length}</b></div><div><span>Analistas</span><b>{analysts.length}</b></div></div></div></div></>
 }
 
@@ -147,12 +152,13 @@ function Urgency({value}:{value:string}){return <span className={`pill urgency $
 function Avatar({name}:{name:string}){const {technicians}=useAppData();const t=technicians.find(x=>x.name===name);return <span className="tiny-avatar" style={{background:t?.color}}>{t?.initials||"?"}</span>}
 
 function Kanban({items,setItems,initialSearch,flash}:{items:Ticket[];setItems:(x:Ticket[])=>void;initialSearch:string;flash:(s:string)=>void}){
+ const {configured,profile}=useAuth();const suggestedAnalyst=configured&&profile?.role==="analista"?profile.analystName||"":"";
  const {technicians:techs,branches:filiaisBase,analysts,createTicket,updateTicket,cancelTicket,deleteTicket}=useAppData();
  const cols:Status[]=["Novo","Programado","Aguardando compra","Aguardando entrega","Em atendimento","Concluído","Fechado","Cancelado"];
  const [query,setQuery]=useState(initialSearch); const [tech,setTech]=useState(""); const [urgency,setUrgency]=useState(""); const [status,setStatus]=useState(""); const [city,setCity]=useState(""); const [analyst,setAnalyst]=useState("");const [plannedDate,setPlannedDate]=useState("");const [dueDate,setDueDate]=useState("");const [issue,setIssue]=useState(""); const [editing,setEditing]=useState<Ticket|null>(null); const [isNew,setIsNew]=useState(false); const [formError,setFormError]=useState("");
  useEffect(()=>setQuery(initialSearch),[initialSearch]);
  const shown=items.filter(t=>{const hay=`${t.number} ${t.branch} ${t.branchNumber||""} ${t.city} ${t.desc} ${t.tech||""} ${t.status} ${ticketAnalyst(t)}`.toLowerCase();const coordIssue=issue==="sem_coordenadas"&&!isValidCoordinate(t.latitude,t.longitude);const branchIssue=issue==="revisar_filial"&&t.reviewBranch;const overdue=issue==="atrasado"&&!!t.dueAt&&t.dueAt<new Date().toISOString().slice(0,10)&&!(["Concluído","Fechado","Cancelado"] as Status[]).includes(t.status);return(!query||hay.includes(query.toLowerCase()))&&(!tech||t.tech===tech)&&(!urgency||t.urgency===urgency)&&(!status||t.status===status)&&(!city||t.city===city)&&(!analyst||ticketAnalyst(t)===analyst)&&(!plannedDate||t.date===plannedDate)&&(!dueDate||t.dueAt===dueDate)&&(!issue||coordIssue||branchIssue||overdue)});
- const openNew=()=>{const f=filiaisBase[0];setFormError("");setEditing({id:0,number:"",branch:f?.nome||"Filial não localizada",branchId:f?.id,branchNumber:f?.numeroFilial,branchCnpj:f?.cnpj,city:f?`${f.cidade}, ${f.uf}`:"",uf:f?.uf||"",address:f?.endereco||"",latitude:f?.latitude??null,longitude:f?.longitude??null,desc:"",status:"Novo",urgency:"Média",duration:60,analistaResponsavel:"",analyst:"",openedAt:new Date().toISOString().slice(0,10),tech:undefined,date:undefined,routeId:undefined,routeOrder:undefined,planningStatus:"nao_planejado",reviewBranch:!f});setIsNew(true)};
+ const openNew=()=>{const f=filiaisBase[0];setFormError("");setEditing({id:0,number:"",branch:f?.nome||"Filial não localizada",branchId:f?.id,branchNumber:f?.numeroFilial,branchCnpj:f?.cnpj,city:f?`${f.cidade}, ${f.uf}`:"",uf:f?.uf||"",address:f?.endereco||"",latitude:f?.latitude??null,longitude:f?.longitude??null,desc:"",status:"Novo",urgency:"Média",duration:60,analistaResponsavel:suggestedAnalyst,analyst:suggestedAnalyst,openedAt:new Date().toISOString().slice(0,10),tech:undefined,date:undefined,routeId:undefined,routeOrder:undefined,planningStatus:"nao_planejado",reviewBranch:!f});setIsNew(true)};
  const save=()=>{if(!editing)return;const missing=[];if(!editing.number.trim())missing.push("número do chamado");if(!editing.desc.trim())missing.push("descrição");if(!editing.branchNumber&&!editing.city.trim())missing.push("filial ou cidade");if(missing.length){setFormError(`Preencha: ${missing.join(", ")}.`);return}if(items.some(item=>item.id!==editing.id&&normalizeText(item.number)===normalizeText(editing.number))){setFormError("Já existe um chamado com este número.");return}if(editing.status==="Cancelado"&&!window.confirm("Cancelar este chamado e removê-lo do planejamento?"))return;const clean={...editing,number:editing.number.trim(),desc:editing.desc.trim(),city:editing.city.trim(),address:editing.address.trim()||"Endereço não informado",duration:Number.isFinite(editing.duration)&&editing.duration>0?editing.duration:60,tech:editing.tech||undefined,date:editing.date||undefined};if(isNew){const {id:ignored,...draft}=clean;createTicket({...draft,routeId:undefined,routeOrder:undefined,planningStatus:"nao_planejado"})}else updateTicket(clean);setEditing(null);setIsNew(false);setFormError("");flash(isNew?"Chamado criado com sucesso":"Chamado atualizado com sucesso")};
  const cancelCurrent=()=>{if(!editing||!window.confirm("Cancelar este chamado e removê-lo do planejamento?"))return;cancelTicket(editing.id);setEditing(null);flash("Chamado cancelado e removido do planejamento")};
  const deleteCurrent=()=>{if(!editing||!window.confirm("Tem certeza que deseja excluir este chamado? Essa ação não pode ser desfeita."))return;deleteTicket(editing.id);setEditing(null);flash("Chamado excluído definitivamente")};

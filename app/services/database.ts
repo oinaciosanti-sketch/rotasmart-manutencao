@@ -26,7 +26,8 @@ export async function findOne(table: string, column: string, value: string) {
 export async function saveByNaturalKey(table: string, column: string, value: string, payload: Record<string, unknown>) {
   const client = requireSupabaseBrowserClient();
   const existing = await findOne(table, column, value);
-  const query = existing ? client.from(table).update(payload).eq("id", existing.id) : client.from(table).insert(payload);
+  const insertPayload=!existing&&payload.updated_by&&!payload.created_by?{...payload,created_by:payload.updated_by}:payload;
+  const query = existing ? client.from(table).update(payload).eq("id", existing.id) : client.from(table).insert(insertPayload);
   const { data, error } = await query.select("*").single();
   if (error) throw error;
   return { row:data as Record<string, any>,created:!existing };

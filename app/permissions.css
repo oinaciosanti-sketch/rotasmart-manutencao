@@ -1,0 +1,13 @@
+.role-analista .page-tcnicos .btn.primary,
+.role-analista .page-tcnicos .edit-tech {
+  display: none !important;
+}
+
+.role-analista .page-configuraes .settings-grid > .settings-card:first-child .settings-actions button:nth-child(2),
+.role-analista .page-configuraes .analyst-list button,
+.role-analista .page-configuraes .inline-add,
+.role-visualizador .page-configuraes .settings-grid > .settings-card:first-child .settings-actions button:nth-child(2),
+.role-visualizador .page-configuraes .analyst-list button,
+.role-visualizador .page-configuraes .inline-add {
+  display: none !important;
+}

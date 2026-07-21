@@ -1,4 +1,10 @@
-import type { ProfileRow } from "../types/database";
-import { requireSupabaseBrowserClient } from "../lib/supabase/client";
-export async function getCurrentProfile(){const client=requireSupabaseBrowserClient();const {data:{user}}=await client.auth.getUser();if(!user)return null;const {data,error}=await client.from("profiles").select("*").eq("id",user.id).single();if(error)throw error;return data as ProfileRow}
-export async function updateProfile(id:string,input:Partial<Pick<ProfileRow,"nome"|"role"|"analyst_id"|"ativo">>){const {data,error}=await requireSupabaseBrowserClient().from("profiles").update(input).eq("id",id).select().single();if(error)throw error;return data as ProfileRow}
+import type {AppRole,ProfileRow,ProfileStatus} from "../types/database";
+import {requireSupabaseBrowserClient} from "../lib/supabase/client";
+
+export type ProfileInput={nome:string;email:string;role:AppRole;analyst_id:string|null;status:ProfileStatus;notes:string};
+
+export async function listProfiles(){const {data,error}=await requireSupabaseBrowserClient().from("profiles").select("*,analysts(name)").order("nome");if(error)throw error;return data as ProfileRow[]}
+export async function getCurrentProfile(){const client=requireSupabaseBrowserClient();const {data:{user}}=await client.auth.getUser();if(!user)return null;let result=await client.from("profiles").select("*,analysts(name)").eq("user_id",user.id).maybeSingle();if(result.error&&result.error.code==="42703")result=await client.from("profiles").select("*").eq("id",user.id).maybeSingle();if(result.error)throw result.error;if(result.data)return result.data as ProfileRow;const claimed=await client.rpc("claim_my_pending_profile");if(claimed.error)throw claimed.error;return claimed.data as ProfileRow}
+export async function createPendingProfile(input:ProfileInput){const client=requireSupabaseBrowserClient();const email=input.email.trim().toLowerCase();const existing=await client.from("profiles").select("id").ilike("email",email).maybeSingle();if(existing.error)throw existing.error;if(existing.data)throw new Error("Já existe um perfil com este e-mail.");const {data:{user}}=await client.auth.getUser();const {data,error}=await client.from("profiles").insert({...input,email,user_id:null,ativo:input.status==="ativo",created_by:user?.id||null,updated_by:user?.id||null}).select("*,analysts(name)").single();if(error)throw error;return data as ProfileRow}
+export async function updateProfile(id:string,input:Partial<ProfileInput>){const client=requireSupabaseBrowserClient();const {data:{user}}=await client.auth.getUser();const payload={...input,...(input.status?{ativo:input.status==="ativo"}:{}),updated_by:user?.id||null};const {data,error}=await client.from("profiles").update(payload).eq("id",id).select("*,analysts(name)").single();if(error)throw error;return data as ProfileRow}
+export async function deactivateProfile(id:string){return updateProfile(id,{status:"inativo"})}
