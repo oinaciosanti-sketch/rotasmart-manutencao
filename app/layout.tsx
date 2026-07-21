@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./permissions.css";
 import "./portal.css";
+import "./execution.css";
 import "leaflet/dist/leaflet.css";
 import { AuthProvider } from "./components/AuthProvider";
 

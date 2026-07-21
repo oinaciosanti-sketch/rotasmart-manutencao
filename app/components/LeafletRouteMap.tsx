@@ -20,6 +20,7 @@ export type LeafletStop = {
   address?: string;
   technician?: string;
   status?: string;
+  technicianStatus?: string;
   order?: number;
   urgency?: string;
   analyst?: string;
@@ -150,6 +151,11 @@ export default function LeafletRouteMap({ routes }: { routes: LeafletRoute[] }) 
                         Técnico: {stop.technician || route.technician || "Não informado"}
                       </span>
                       <span>Status: {stop.status || "Não informado"}</span>
+                      {stop.technicianStatus && stop.technicianStatus !== "nao_iniciado" && (
+                        <span className={`map-technician-status ${stop.technicianStatus}`}>
+                          Técnico: {stop.technicianStatus === "atendido" || stop.technicianStatus === "concluido" || stop.technicianStatus === "atendimento_finalizado" ? "Atendido pelo técnico" : stop.technicianStatus === "pendente" ? "Pendente pelo técnico" : "Em atendimento pelo técnico"}
+                        </span>
+                      )}
                       <span>Urgência: {stop.urgency || "Não informada"}</span>
                       <span>Analista: {stop.analyst || "Não definido"}</span>
                     </div>

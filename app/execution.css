@@ -1,0 +1,19 @@
+.technician-status-badge{display:inline-flex;align-items:center;width:fit-content;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:700;line-height:1.2}
+.technician-status-badge.em_atendimento,.map-technician-status.em_atendimento{background:#eaf1ff;color:#245cc5}
+.technician-status-badge.atendido,.map-technician-status.atendido{background:#e7f7ee;color:#147a42}
+.tech-status.atendido{background:#e8f7ee;color:#168344}
+.technician-status-badge.pendente,.map-technician-status.pendente{background:#fff3d9;color:#8b5b0a}
+.technician-execution{margin-top:8px;padding:18px;border:1px solid #dfe7ef;border-radius:14px;background:#f8fafc}
+.technician-execution-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}
+.technician-execution-head span:first-child{color:#5269d7;font-size:9px;font-weight:800;letter-spacing:.12em}
+.technician-execution-head h3{margin:4px 0 0;font-size:16px}
+.technician-execution dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;overflow:hidden;margin:0 0 14px;border:1px solid #e3e9ef;border-radius:10px;background:#e3e9ef}
+.technician-execution dl div{min-width:0;padding:10px 12px;background:#fff}
+.technician-execution dl .wide{grid-column:1/-1}
+.technician-execution dt{color:#718096;font-size:9px}
+.technician-execution dd{overflow-wrap:anywhere;margin:4px 0 0;color:#263b50;font-size:11px;font-weight:650}
+.official-complete{border-color:#15864a!important;background:#15864a!important;color:#fff!important}
+.technician-review-actions{display:flex;align-items:center;gap:10px}
+.technician-review-actions span{color:#68798a;font-size:10px}
+.map-technician-status{display:block;margin-top:5px;padding:4px 6px;border-radius:6px;font-weight:700}
+@media (max-width:640px){.technician-execution dl{grid-template-columns:1fr}.technician-execution dl .wide{grid-column:auto}.technician-execution-head,.technician-review-actions{align-items:stretch;flex-direction:column}}
