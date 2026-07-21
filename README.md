@@ -255,3 +255,85 @@ faça novo login para validar o bloqueio.
 - não há Realtime nem resolução automática de edições simultâneas;
 - testes completos com múltiplas contas exigem um projeto Supabase configurado e não
   podem ser simulados apenas no build local.
+
+## RotaSmart 2.2 — aprovação e Portal do Técnico
+
+O 2.2 adiciona o papel `tecnico`, aprovação obrigatória de novos cadastros, vínculo
+usuário–técnico e um portal mobile para execução das rotas. Para atualizar um banco
+2.1 existente, execute no SQL Editor do Supabase, nesta ordem:
+
+1. `supabase/migration_v2_2.sql`
+2. `supabase/policies_v2_2.sql`
+
+Os scripts são incrementais e não removem os dados atuais. Faça um backup JSON antes
+da atualização e publique o novo frontend depois que ambos os scripts concluírem sem
+erros.
+
+### Aprovação de usuários
+
+O primeiro usuário do sistema permanece administrador. Qualquer cadastro posterior
+sem perfil previamente criado recebe papel `visualizador`, status `pendente` e não
+consegue consultar dados internos. Ele vê apenas a mensagem de acesso aguardando
+aprovação.
+
+Na aba **Usuários**, o administrador pode filtrar por papel/status, abrir o perfil
+pendente, definir o papel, vincular um analista ou técnico e alterar o status para
+`ativo`. Também pode inativar, bloquear, reativar ou excluir somente o profile; a
+conta do Supabase Auth não é apagada pelo navegador.
+
+O último administrador ativo não pode ser rebaixado, inativado, bloqueado nem
+excluído. Essa proteção existe na interface e no trigger
+`protect_last_active_admin` do banco.
+
+### Portal do Técnico
+
+Usuários com papel `tecnico` são enviados automaticamente ao Portal do Técnico e só
+recebem do banco as rotas e chamados vinculados ao seu `technician_id`. Se o vínculo
+não estiver configurado, o portal mostra uma orientação para procurar o
+administrador.
+
+O portal contém:
+
+- **Hoje:** resumo da rota atual;
+- **Minha rota:** origem, sequência dos chamados, distância aproximada e execução;
+- **Esta semana:** atendimentos do técnico na semana;
+- **Histórico:** últimos 1, 7 ou 30 dias;
+- **Meu perfil:** jornada e base operacional.
+
+Para iniciar a rota, o técnico informa o KM inicial e confirma a saída. Em cada
+chamado pode iniciar/finalizar atendimento, concluir, pendenciar com observação e
+salvar notas. Ao terminar, informa o KM final; o sistema calcula o KM efetivamente
+percorrido. As funções RPC `technician_update_route` e
+`technician_update_ticket` verificam o vínculo antes de qualquer gravação.
+
+As atualizações ficam disponíveis para administradores e analistas em Chamados,
+Planner e demais telas após a sincronização/recarga. O Dashboard inclui rotas em
+andamento, concluídas hoje, sem KM final e chamados pendenciados pelo técnico.
+
+### Modo mobile e desktop
+
+O botão com ícone de celular alterna a interface sem alterar permissões. A escolha é
+salva no `localStorage` por usuário. Técnicos sempre permanecem no portal, alternando
+apenas entre apresentação compacta e ampliada. Administradores podem abrir o modo
+mobile para testar o portal com um técnico ativo.
+
+### Teste recomendado do 2.2
+
+1. Crie uma conta nova em janela anônima e confirme a tela de aprovação pendente.
+2. Como admin, aprove a conta, selecione papel `tecnico` e vincule um técnico ativo.
+3. Entre novamente com a conta técnica e confirme que apenas sua rota aparece.
+4. Informe KM inicial, inicie/finalize um atendimento, conclua ou pendencie outro e
+   finalize a rota com KM final.
+5. Recarregue a página e confira histórico, horários e quilometragem.
+6. Entre como admin/analista e confira os mesmos dados no chamado e Dashboard.
+7. Tente rebaixar o único admin ativo e confirme a mensagem de proteção.
+
+### Limitações do 2.2
+
+- não há atualização Realtime entre navegadores; outro usuário pode precisar
+  recarregar para ver uma ação recém-registrada;
+- o modo administrativo do portal usa o primeiro técnico ativo como prévia;
+- não há GPS automático, fotos, anexos, assinatura ou checklist avançado;
+- a linha e a distância continuam aproximadas por Haversine, sem ruas/rodovias;
+- exclusão da conta Auth continua sendo feita somente pelo painel seguro do Supabase;
+- testes multiusuário completos exigem o projeto Supabase publicado e contas reais.

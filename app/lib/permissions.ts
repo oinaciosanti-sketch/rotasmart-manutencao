@@ -1,4 +1,4 @@
-export type AppRole = "admin" | "analista" | "visualizador";
+export type AppRole = "admin" | "analista" | "tecnico" | "visualizador";
 
 export type PermissionAction =
   | "users.manage"
@@ -7,6 +7,9 @@ export type PermissionAction =
   | "tickets.delete"
   | "routes.create"
   | "routes.confirm"
+  | "routes.execute"
+  | "tickets.technicianUpdate"
+  | "portal.view"
   | "branches.update"
   | "branches.delete"
   | "technicians.update"
@@ -26,5 +29,6 @@ const analystActions = new Set<PermissionAction>([
 export function can(role: AppRole | null | undefined, action: PermissionAction) {
   if (role === "admin") return true;
   if (role === "analista") return analystActions.has(action);
+  if (role === "tecnico") return ["portal.view","routes.execute","tickets.technicianUpdate"].includes(action);
   return false;
 }
