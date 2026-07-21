@@ -29,4 +29,9 @@
 .tech-week-day .tech-route-list{gap:8px;padding:10px}
 .tech-week-day .tech-stop-card{box-shadow:none}
 .tech-day-empty{padding:18px 14px;color:#7a8998;font-size:10px;text-align:center}
+.app.cloud-busy .content button{pointer-events:none;opacity:.62;cursor:wait}
+.app.cloud-busy .data-mode-banner{position:relative;overflow:hidden}
+.app.cloud-busy .data-mode-banner:after{content:"";position:absolute;left:0;bottom:0;width:35%;height:2px;background:#2563eb;animation:cloud-sync-bar 1s ease-in-out infinite alternate}
+.cloud-loading-screen{min-height:100vh;display:grid;place-items:center;background:#f4f7fa;color:#34516c;font-size:14px;font-weight:700}
+@keyframes cloud-sync-bar{from{transform:translateX(-100%)}to{transform:translateX(285%)}}
 @media (max-width:640px){.technician-execution dl{grid-template-columns:1fr}.technician-execution dl .wide{grid-column:auto}.technician-execution-head,.technician-review-actions{align-items:stretch;flex-direction:column}}
