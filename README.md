@@ -385,6 +385,19 @@ variável. Nunca envie `.env.local` ao GitHub.
 5. Salve/confirme a rota, atualize a página e confirme que o resultado foi restaurado
    do Supabase.
 
+### Diagnóstico TomTom
+
+Ao clicar em **Recalcular rota por ruas**, administradores veem a fonte atual, data da
+última tentativa, status HTTP, detecção da variável no servidor, quantidade de pontos
+da geometria e confirmação de persistência. Os logs da função `/api/routing` registram
+somente informações seguras; o conteúdo de `TOMTOM_API_KEY` nunca é escrito no log nem
+devolvido ao navegador.
+
+Se continuar em Haversine, consulte o painel e os Function Logs da Vercel. A interface
+distingue chave ausente, autenticação recusada, limite atingido, rota não encontrada,
+timeout e falha geral do provedor. Confirme também que a variável foi habilitada para o
+ambiente do deploy atual e faça um novo deploy após qualquer alteração.
+
 ### Limitações
 
 - depende da disponibilidade e dos limites de uso do plano da TomTom;
