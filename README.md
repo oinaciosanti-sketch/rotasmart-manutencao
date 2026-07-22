@@ -398,6 +398,14 @@ distingue chave ausente, autenticação recusada, limite atingido, rota não enc
 timeout e falha geral do provedor. Confirme também que a variável foi habilitada para o
 ambiente do deploy atual e faça um novo deploy após qualquer alteração.
 
+### Correção incremental de distância e persistência
+
+Execute `supabase/migration_v2_3_tomtom_distance_fix.sql` no SQL Editor. A migration
+mantém dados existentes, garante as colunas de distância/geometria e cria a função
+transacional `save_route_plan`. Adicionar, remover, reordenar ou confirmar paradas passa
+a atualizar rota, chamados e `route_stops` na mesma transação; a interface só assume a
+alteração depois da confirmação do Supabase.
+
 ### Limitações
 
 - depende da disponibilidade e dos limites de uso do plano da TomTom;

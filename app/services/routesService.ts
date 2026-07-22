@@ -12,11 +12,18 @@ export async function replaceRouteStops(routeId:string,stops:Array<Pick<RouteSto
 export type CloudRoutePlanTicket={id:string;order:number;latitude?:number|null;longitude?:number|null};
 export type CloudRoadRoute={distanceKm:number|null;durationMinutes:number|null;geometry:Array<[number,number]>;source:"tomtom"|"openrouteservice"|"graphhopper"|"osrm"|"google"|"haversine";calculatedAt:string};
 export async function reconcileRoutePlan(input:{technicianId:string;date:string;planningStatus:"nao_planejado"|"em_rota_rascunho"|"rota_confirmada";tickets:CloudRoutePlanTicket[];roadRoute?:CloudRoadRoute}){
- const client=requireSupabaseBrowserClient();const {data:{user}}=await client.auth.getUser();const actor=user?.id||null;const existing=await client.from("routes").select("*").eq("technician_id",input.technicianId).eq("route_date",input.date).maybeSingle();if(existing.error)throw existing.error;
- const routeStatus=input.planningStatus==="rota_confirmada"?"confirmada":"rascunho";const routing=input.roadRoute?{road_distance_km:input.roadRoute.distanceKm,road_duration_minutes:input.roadRoute.durationMinutes,route_geometry:input.roadRoute.geometry,route_source:input.roadRoute.source,route_calculated_at:input.roadRoute.calculatedAt}:{};const routeQuery=existing.data?client.from("routes").update({status:routeStatus,updated_by:actor,...routing}).eq("id",existing.data.id):client.from("routes").insert({technician_id:input.technicianId,route_date:input.date,status:routeStatus,created_by:actor,updated_by:actor,...routing});const routeResult=await routeQuery.select().single();if(routeResult.error)throw routeResult.error;const routeId=routeResult.data.id as string;
- const oldStops=await client.from("route_stops").select("ticket_id").eq("route_id",routeId);if(oldStops.error)throw oldStops.error;const desiredIds=new Set(input.tickets.map(ticket=>ticket.id));const removedIds=(oldStops.data||[]).map(stop=>stop.ticket_id as string).filter(id=>!desiredIds.has(id));
- const clearStops=await client.from("route_stops").delete().eq("route_id",routeId);if(clearStops.error)throw clearStops.error;if(removedIds.length){const cleared=await client.from("tickets").update({technician_id:null,planned_date:null,route_id:null,route_order:null,planning_status:"nao_planejado",updated_by:actor}).in("id",removedIds);if(cleared.error)throw cleared.error}
- for(const ticket of input.tickets){const payload:Record<string,unknown>={technician_id:input.technicianId,planned_date:input.date,route_id:routeId,route_order:ticket.order,planning_status:input.planningStatus,updated_by:actor};if(input.planningStatus==="rota_confirmada")payload.status="Programado";const updated=await client.from("tickets").update(payload).eq("id",ticket.id);if(updated.error)throw updated.error}
- if(input.tickets.length){const stops=await client.from("route_stops").insert(input.tickets.map(ticket=>({route_id:routeId,ticket_id:ticket.id,stop_order:ticket.order,latitude:ticket.latitude??null,longitude:ticket.longitude??null})));if(stops.error)throw stops.error}
- return routeResult.data as RouteRow;
+ const client=requireSupabaseBrowserClient();
+ const {data,error}=await client.rpc("save_route_plan",{
+  p_technician_id:input.technicianId,
+  p_route_date:input.date,
+  p_planning_status:input.planningStatus,
+  p_tickets:input.tickets.map(ticket=>({id:ticket.id,order:ticket.order,latitude:ticket.latitude??null,longitude:ticket.longitude??null})),
+  p_road_distance_km:input.roadRoute?.distanceKm??null,
+  p_road_duration_minutes:input.roadRoute?.durationMinutes??null,
+  p_route_geometry:input.roadRoute?.geometry??null,
+  p_route_source:input.roadRoute?.source??null,
+  p_route_calculated_at:input.roadRoute?.calculatedAt??null,
+ });
+ if(error){if(error.code==="PGRST202"||error.code==="42883")throw new Error("Execute supabase/migration_v2_3_tomtom_distance_fix.sql antes de salvar rotas.");throw error}
+ return data as RouteRow;
 }
