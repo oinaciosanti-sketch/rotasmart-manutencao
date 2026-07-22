@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RotaSmart Bridge</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="logo">RS</div>
+    <div><span>INTEGRAÇÃO MOVIDESK</span><h1>RotaSmart Bridge</h1></div>
+  </header>
+  <main>
+    <p class="intro">Leia os cards visíveis do Kanban e gere um arquivo para importar no RotaSmart.</p>
+    <button id="analyze" class="button primary">Analisar Kanban</button>
+    <div id="message" class="message" hidden></div>
+
+    <section id="statusSection" hidden>
+      <div class="section-title"><b>Status encontrados</b><button id="toggleAll" type="button">Desmarcar todos</button></div>
+      <div id="statuses" class="statuses"></div>
+      <button id="extract" class="button secondary">Extrair selecionados</button>
+    </section>
+
+    <section id="resultSection" hidden>
+      <div id="summary" class="summary"></div>
+      <div class="preview-wrap">
+        <table>
+          <thead><tr><th>Chamado</th><th>Status</th><th>Resumo</th><th></th></tr></thead>
+          <tbody id="preview"></tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <button id="exportJson" class="button primary">Exportar JSON</button>
+        <button id="exportCsv" class="button secondary">Exportar CSV</button>
+      </div>
+    </section>
+
+    <details>
+      <summary>Diagnóstico</summary>
+      <pre id="logs">Aguardando análise.</pre>
+    </details>
+  </main>
+  <script src="utils.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "RotaSmart Bridge",
+  "version": "1.0.1",
+  "description": "Extrai chamados visíveis do Kanban do Movidesk para importar no RotaSmart.",
+  "permissions": ["activeTab", "scripting", "downloads"],
+  "host_permissions": ["https://agricopel.movidesk.com/*"],
+  "action": {
+    "default_title": "RotaSmart Bridge",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://agricopel.movidesk.com/*"],
+      "js": ["utils.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

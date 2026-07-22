@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Movidesk — Kanban simulado</title>
+  <style>
+    body{font:14px Arial;background:#eef2f6;margin:0;padding:30px}h1{margin-top:0}.board{display:flex;gap:20px;align-items:flex-start}.kanban-column{width:300px;background:#f8fafc;border-radius:12px;padding:14px;box-shadow:0 3px 12px #0001}.column-title{margin:0 0 12px}.kanban-card{display:block;margin:10px 0;padding:13px;border-radius:8px;background:white;color:#24364a;text-decoration:none;border:1px solid #dae2ea}.kanban-card b,.kanban-card span{display:block}.kanban-card span{margin-top:6px;color:#66768a}
+  </style>
+</head>
+<body>
+  <h1>Kanban Movidesk — página simulada</h1>
+  <div class="board">
+    <section class="kanban-column" data-column-id="novo">
+      <h2 class="column-title">Novo (2)</h2>
+      <a class="kanban-card" data-ticket-id="98496" href="https://agricopel.movidesk.com/Ticket/Edit/98496"><b>#98496 — Bomba com falha</b><span>Posto Agricopel Filial 02</span><span>Jaraguá do Sul, SC</span></a>
+      <a class="kanban-card" href="https://agricopel.movidesk.com/Ticket/Edit?id=98501"><b>Chamado 98501</b><span>Troca de equipamento</span><span>Filial 12 — Itajaí, SC</span></a>
+    </section>
+    <section class="kanban-column" data-column-id="atendimento">
+      <h2 class="column-title">Em atendimento (1)</h2>
+      <article class="kanban-card" data-ticket-id="98502"><b>Ticket #98502</b><span>Manutenção preventiva</span><span>FL 21</span><span>Blumenau, SC</span></article>
+    </section>
+    <section class="kanban-column" data-column-id="customizado">
+      <h2 class="column-title">Aguardando fornecedor (1)</h2>
+      <article class="kanban-card"><b>Solicitação sem número visível</b><span>Filial não identificada</span></article>
+    </section>
+  </div>
+</body>
+</html>

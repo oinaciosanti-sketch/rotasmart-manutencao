@@ -170,6 +170,18 @@ e depois **Importar backup**. O arquivo é validado antes da substituição dos 
 Alterações de rota, técnico, filial e chamado são refletidas nas demais telas por meio
 do estado centralizado e persistidas no navegador.
 
+## RotaSmart Bridge — importação do Movidesk
+
+A pasta `rotasmart-bridge-extension` contém uma extensão Chrome Manifest V3 que
+analisa os cards visíveis do Kanban do Movidesk, permite escolher os status e
+exporta JSON ou CSV. A extensão não altera o Movidesk e não envia dados diretamente.
+
+O JSON gerado é aceito em **Importar chamados**. O importador reconhece a origem
+`movidesk-kanban-extension`, apresenta uma prévia e evita duplicidade pelo número
+do chamado ou `movideskId`. Registros sem filial/cidade identificada ficam marcados
+para revisão; ao atualizar chamados existentes, o planejamento e a rota são
+preservados. Consulte `rotasmart-bridge-extension/README.md` para instalação e uso.
+
 ## Analistas e Dashboard
 
 A aba **Analistas** mantém registros completos, com status ativo/inativo, contato,
