@@ -348,6 +348,46 @@ mobile para testar o portal com um técnico ativo.
   recarregar para ver uma ação recém-registrada;
 - o modo administrativo do portal usa o primeiro técnico ativo como prévia;
 - não há GPS automático, fotos, anexos, assinatura ou checklist avançado;
-- a linha e a distância continuam aproximadas por Haversine, sem ruas/rodovias;
+- sem cálculo manual, ou se a API externa falhar, a linha e a distância continuam aproximadas por Haversine;
 - exclusão da conta Auth continua sendo feita somente pelo painel seguro do Supabase;
 - testes multiusuário completos exigem o projeto Supabase publicado e contas reais.
+
+## RotaSmart 2.3 — rota por ruas com TomTom
+
+O botão **Calcular rota por ruas**, na tela Montar rota, envia apenas as coordenadas
+válidas para a API interna `/api/routing`. A chave da TomTom permanece no
+servidor e nunca é incluída no JavaScript do navegador. A ordem das paradas não é
+otimizada: o serviço apenas calcula o trajeto rodoviário na ordem já montada.
+
+A camada `routingService` mantém o provedor separado da interface. A TomTom é o
+provedor ativo nesta versão, com estrutura preparada para GraphHopper, OSRM ou Google
+Routes no futuro, sem expor credenciais no frontend.
+
+### Configuração
+
+1. Crie uma conta no [TomTom Developer Portal](https://developer.tomtom.com/) e gere uma API Key para a Routing API.
+2. No projeto da Vercel, abra **Settings → Environment Variables**.
+3. Cadastre `TOMTOM_API_KEY` com a chave, sem usar o prefixo `NEXT_PUBLIC`.
+4. Marque os ambientes desejados e faça um novo deploy.
+5. No SQL Editor do Supabase, execute `supabase/migration_v2_3_routing.sql`.
+
+Para desenvolvimento local, copie `.env.example` para `.env.local` e preencha a
+variável. Nunca envie `.env.local` ao GitHub.
+
+### Teste
+
+1. Monte uma rota com origem e ao menos uma parada com coordenadas.
+2. Clique em **Calcular rota por ruas**.
+3. Com a chave configurada, confira o selo **Rota por ruas — TomTom**, a
+   distância, a duração e a linha acompanhando as vias no mapa.
+4. Remova temporariamente a chave ou simule uma falha e confirme o aviso de fallback
+   **Estimativa em linha reta — Haversine**.
+5. Salve/confirme a rota, atualize a página e confirme que o resultado foi restaurado
+   do Supabase.
+
+### Limitações
+
+- depende da disponibilidade e dos limites de uso do plano da TomTom;
+- não reordena as paradas por tempo rodoviário;
+- pontos que não puderem ser associados à malha viária podem provocar fallback;
+- não inclui trânsito em tempo real, pedágios, GPS ou navegação passo a passo.

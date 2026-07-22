@@ -37,7 +37,15 @@ export type LeafletRoute = {
     longitude?: number | null;
   };
   stops: LeafletStop[];
+  geometry?: Array<[number, number]>;
+  source?: "tomtom" | "openrouteservice" | "graphhopper" | "osrm" | "google" | "haversine";
+  distanceKm?: number | null;
+  durationMinutes?: number | null;
 };
+
+const validGeometry = (geometry: LeafletRoute["geometry"]): geometry is Array<[number, number]> =>
+  Array.isArray(geometry) && geometry.length >= 2 && geometry.every((point) =>
+    Array.isArray(point) && point.length === 2 && isValidCoordinate(point[0], point[1]));
 
 function FitMap({ routes }: { routes: LeafletRoute[] }) {
   const map = useMap();
@@ -46,6 +54,9 @@ function FitMap({ routes }: { routes: LeafletRoute[] }) {
     const points: LatLngExpression[] = [];
 
     routes.forEach((route) => {
+      if (validGeometry(route.geometry)) {
+        route.geometry.forEach((point) => points.push(point));
+      }
       if (route.start && isValidCoordinate(route.start.latitude, route.start.longitude)) {
         points.push([route.start.latitude as number, route.start.longitude as number]);
       }
@@ -77,8 +88,11 @@ export default function LeafletRouteMap({ routes }: { routes: LeafletRoute[] }) 
     return getValidRoutePoints(candidates).length >= 2;
   });
 
+  const hasRoadRoute=safeRoutes.some(route=>!!route.source&&route.source!=="haversine"&&validGeometry(route.geometry));
+  const hasFallbackRoute=safeRoutes.some(route=>!route.source||route.source==="haversine"||!validGeometry(route.geometry));
   const notices = [
-    "Linha aproximada entre pontos. Ainda não considera ruas/rodovias.",
+    hasRoadRoute ? "Rota por ruas — TomTom." : null,
+    hasFallbackRoute ? "Estimativa em linha reta — Haversine." : null,
     startMissing ? "Ponto de saída sem coordenada." : null,
     !enoughForLine ? "Não há coordenadas suficientes para desenhar a rota." : null,
   ].filter((notice): notice is string => Boolean(notice));
@@ -104,6 +118,8 @@ export default function LeafletRouteMap({ routes }: { routes: LeafletRoute[] }) 
             ...(validStart ? [validStart] : []),
             ...validStops,
           ]).map((point) => [point.latitude as number, point.longitude as number]);
+          const roadLine:LatLngExpression[]=validGeometry(route.geometry)?route.geometry:[];
+          const displayedLine=roadLine.length>=2?roadLine:line;
 
           return (
             <div key={`${route.technician || "rota"}-${routeIndex}`}>
@@ -163,14 +179,14 @@ export default function LeafletRouteMap({ routes }: { routes: LeafletRoute[] }) 
                 </CircleMarker>
               ))}
 
-              {line.length >= 2 && (
+              {displayedLine.length >= 2 && (
                 <Polyline
-                  positions={line}
+                  positions={displayedLine}
                   pathOptions={{
                     color: route.color || "#2563eb",
                     weight: 5,
                     opacity: 0.82,
-                    dashArray: "8 7",
+                    dashArray: roadLine.length>=2 ? undefined : "8 7",
                   }}
                 />
               )}
