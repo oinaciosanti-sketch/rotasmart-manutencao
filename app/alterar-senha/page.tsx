@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+import { getSupabaseBrowserClient } from "../lib/supabase/client";
 
 export default function AlterarSenhaPage() {
   const [email, setEmail] = useState("");
