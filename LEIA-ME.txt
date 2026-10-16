@@ -1,0 +1,22 @@
+RotaSmart — Atualização: Alterar minha senha
+
+Esta atualização ADICIONA somente um arquivo novo:
+  app/alterar-senha/page.tsx
+
+Não substitua app/page.tsx nem os arquivos existentes.
+
+PUBLICAÇÃO PELO GITHUB
+1. No repositório oinaciosanti-sketch/rotasmart-manutencao abra Add file > Upload files.
+2. Arraste a pasta app extraída deste ZIP (preservando o caminho app/alterar-senha/page.tsx).
+   Se o navegador não preservar as subpastas, use Add file > Create new file,
+   nomeie app/alterar-senha/page.tsx e cole o conteúdo do arquivo.
+3. Confirme o commit na branch main.
+4. Aguarde o deploy automático na Vercel.
+5. SEM SAIR DA SESSÃO ATUAL, acesse:
+   https://rotasmart-manutencao.vercel.app/alterar-senha
+6. Confira o e-mail mostrado e defina sua nova senha.
+
+Se sua sessão expirar ou se o Supabase exigir reautenticação, a operação
+pode solicitar uma verificação adicional. Não exclua seu usuário.
+
+A atualização não toca em chamados, perfis, roles ou tabelas.
