@@ -29,7 +29,8 @@ type Ticket = AppTicket;
 type Technician = AppTechnician;
 const relativeDate=(days:number)=>{const date=new Date();date.setHours(12,0,0,0);date.setDate(date.getDate()+days);return date.toISOString().slice(0,10)};
 
-const tickets: Ticket[] = [
+
+const tickets: Ticket[] = [];
   { id:1, number:"#4821", branch:filiaisBase[0].nome, branchId:filiaisBase[0].id,branchNumber:filiaisBase[0].numeroFilial,city:`${filiaisBase[0].cidade}, ${filiaisBase[0].uf}`,uf:filiaisBase[0].uf,latitude:filiaisBase[0].latitude,longitude:filiaisBase[0].longitude,desc:"Bomba 03 apresentando falha intermitente", status:"Novo", urgency:"Alta", duration:90, address:filiaisBase[0].endereco },
   { id:2, number:"#4818", branch:filiaisBase[4].nome, branchId:filiaisBase[4].id,branchNumber:filiaisBase[4].numeroFilial,city:`${filiaisBase[4].cidade}, ${filiaisBase[4].uf}`,uf:filiaisBase[4].uf,latitude:filiaisBase[4].latitude,longitude:filiaisBase[4].longitude,desc:"Preventiva do quadro elétrico", status:"Novo", urgency:"Média", duration:60, address:filiaisBase[4].endereco },
   { id:3, number:"#4812", branch:filiaisBase[5].nome, branchId:filiaisBase[5].id,branchNumber:filiaisBase[5].numeroFilial,city:`${filiaisBase[5].cidade}, ${filiaisBase[5].uf}`,uf:filiaisBase[5].uf,latitude:filiaisBase[5].latitude,longitude:filiaisBase[5].longitude,desc:"Ruído excessivo no compressor", status:"Programado", urgency:"Alta", tech:"Wagner", date:relativeDate(0), duration:120, address:filiaisBase[5].endereco, planningStatus:"rota_confirmada",routeOrder:1 },
