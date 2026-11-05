@@ -1,0 +1,28 @@
+ROTASMART — CORREÇÃO DA FALHA DE COMPILAÇÃO DO TECHNICALREPORT
+
+O problema foi um TechnicalReport.tsx duplicado na RAIZ do GitHub,
+que tinha a importação ../data/AppDataContext — inválida nesse caminho.
+
+CORREÇÃO SEGURA (SEM EXCLUIR ARQUIVOS):
+1. Extraia este ZIP.
+2. No GitHub, na pasta PRINCIPAL (raiz) do repositório,
+   substitua o conteúdo de TechnicalReport.tsx pelo arquivo
+   TechnicalReport.tsx que está na raiz deste ZIP.
+   Importante: não crie uma pasta adicional para o ZIP!
+3. NÃO altere nem apague app/components/TechnicalReport.tsx.
+4. NÃO altere nem apague scripts/apply-technical-report.cjs.
+5. NÃO altere o package.json.
+6. Faça Commit changes. A Vercel vai tentar compilar novamente.
+
+VERIFICACAO: os arquivos abaixo DEVEM existir no GitHub:
+- app/components/TechnicalReport.tsx
+- scripts/apply-technical-report.cjs
+- TechnicalReport.tsx (na raiz, agora somente reexportando o componente)
+
+Isso resolve o erro exibido: Cannot find module '../data/AppDataContext'
+na linha 5 de /TechnicalReport.tsx. A compilação completa só pode ser
+confirmada no próximo deployment da Vercel.
+
+OBS: para realmente eliminar o arquivo duplicado, você também pode
+simplesmente apagar SOMENTE o TechnicalReport.tsx da raiz.
+O pacote usa um reexport para evitar que o passo de excluir seja necessário.
