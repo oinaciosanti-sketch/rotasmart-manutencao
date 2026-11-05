@@ -1,43 +1,30 @@
-ROTASMART — ATENDIMENTO TÉCNICO NO CHAMADO (MVP DEMONSTRATIVO)
+ROTASMART - CORRECAO DA ATUALIZACAO ATENDIMENTO TECNICO
 
-INSTALAÇÃO NO GITHUB
-1. Faça backup do repositório antes da atualização.
-2. Extraia este ZIP no computador.
-3. No GitHub, em Add file > Upload files, envie os TRÊS itens com suas pastas:
-   - package.json (substituir o original)
-   - app/components/TechnicalReport.tsx (novo arquivo)
-   - scripts/apply-technical-report.cjs (novo arquivo)
-   ATENÇÃO: respeite a estrutura das pastas. É mais fácil usar github.dev (tecla '.')
-   para copiar os arquivos para as pastas correspondentes, se o upload web
-   não preservar os diretórios.
-4. Faça Commit changes. A Vercel executará o script antes de next build.
-5. Se Build Command estiver fixado em Vercel Settings, deixe "pnpm build".
-6. Após o deploy, abra um chamado cadastrado. Clique ATEND. TÉCNICO.
-   No portal do técnico, abra o mesmo chamado e use o botão correspondente.
+O ERRO ANTERIOR FOI: Cannot find module '/vercel/path0/scripts/apply-technical-report.cjs'
+O repositório já tinha package.json atualizado, mas FALTAVAM DOIS ARQUIVOS:
+  scripts/apply-technical-report.cjs
+  app/components/TechnicalReport.tsx
 
-O QUE FUNCIONA
-- Botão ATEND. TÉCNICO cinza quando não atendido, verde com relatório salvo
-  ou status de atendimento técnico atendido/concluído.
-- Descrição do serviço, materiais/peças, até 5 fotos compactadas.
-- Horários e demais informações do chamado preenchidos automaticamente.
-- Visualização do analista em modo leitura, lápis para edição.
-- Geração de relatório formatado por impressão do navegador (Salvar como PDF).
-- Número de chamado somente leitura após cadastrar.
+INSTALACAO — SEM APAGAR NADA:
+1) Extraia este ZIP no computador.
+2) Abra o repositório rotasmart-manutencao no GitHub, ramo main.
+3) Dentro da pasta scripts, envie o arquivo apply-technical-report.cjs.
+   - Confirme que o endereço do arquivo ficou EXATAMENTE scripts/apply-technical-report.cjs.
+4) Dentro da pasta app/components, envie TechnicalReport.tsx.
+   - Confirme que ficou EXATAMENTE app/components/TechnicalReport.tsx.
+5) O package.json já foi alterado no GitHub, então NÃO PRECISA reenviá-lo. Está no ZIP só para referência.
+6) Faça Commit changes e acompanhe a nova publicação na Vercel.
 
-LIMITAÇÃO IMPORTANTE
-Esta entrega é um MVP para a instalação atualmente em MODO LOCAL.
-Os registros e fotos de ATEND. TÉCNICO são armazenados no localStorage
-DO NAVEGADOR QUE PREENCHEU: NÃO SÃO SINCRONIZADOS ENTRE CELULARES E PCs.
-Por isso, NÃO atende ainda ao fluxo real de um técnico salvar no celular
-para o analista visualizar imediatamente em outro dispositivo.
-Para uso corporativo, integrar um banco de dados central e armazenamento
-protegido de fotos com políticas de acesso, trilha de auditoria e backups.
-Não utilize dados internos em uma DEMO pública sem verificar as fontes no código.
+ATENCAO: NÃO envie o .ZIP diretamente ao GitHub (ele não extrai automaticamente).
+NÃO envie todos os arquivos soltos na raiz. NÃO substitua as pastas originais.
+NÃO apague app/page.tsx nem app/components/TechnicianPortal.tsx.
 
-COMO A ATUALIZAÇÃO É APLICADA
-A Vercel executa "node scripts/apply-technical-report.cjs && next build".
-O script insere o componente no arquivo de edição de chamado e no portal
-sem você precisar editar manualmente os 126 KB do app/page.tsx.
-O script é idempotente: executar novamente não cria o componente duplicado.
-Se você alterar profundamente os formulários no futuro, talvez seja preciso
-adaptar os pontos de integração.
+VALIDACAO DOS ENDERECOS:
+- https://github.com/oinaciosanti-sketch/rotasmart-manutencao/blob/main/scripts/apply-technical-report.cjs
+- https://github.com/oinaciosanti-sketch/rotasmart-manutencao/blob/main/app/components/TechnicalReport.tsx
+
+LIMITACOES:
+- O modo local guarda registros e fotos apenas no navegador atual.
+- A nova OS técnica é demonstrativa, não sincroniza o celular com o computador.
+- O botão Imprimir/PDF usa a função de impressão do navegador.
+- O script foi conferido contra as marcas atuais dos arquivos de integração, mas a build real deve ser validada na Vercel.
