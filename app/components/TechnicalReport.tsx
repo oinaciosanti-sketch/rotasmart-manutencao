@@ -1,35 +1,56 @@
 "use client";
 
-import {useCallback,useEffect,useState} from "react";
+import {useCallback,useEffect,useState,useSyncExternalStore} from "react";
 import {Camera,CheckCircle2,FileText,Pencil,Printer,Save,Trash2,Wrench} from "lucide-react";
 import type {AppTicket} from "../data/AppDataContext";
 
 type Report={description:string;materials:string;photos:string[];savedAt:string;author:string};
-type Props={ticket:AppTicket;mode:"technician"|"viewer"};
+type Props={ticket:AppTicket;mode:"technician"|"viewer";hideTrigger?:boolean;expanded?:boolean};
 const storageKey=(id:string)=>`rotasmart-technical-report-v1-${encodeURIComponent(id.trim())}`;
+// Same-browser notification for the Kanban, Planner and technical-report editor.
+const REPORT_EVENT="rotasmart:technical-report-changed";
+function subscribeReport(onChange:()=>void){
+  window.addEventListener("storage",onChange);
+  window.addEventListener(REPORT_EVENT,onChange);
+  return ()=>{window.removeEventListener("storage",onChange);window.removeEventListener(REPORT_EVENT,onChange)};
+}
+export function useTechnicalReportAvailable(number:string){
+  const key=storageKey(number);
+  const getSnapshot=useCallback(()=>{try{return !!localStorage.getItem(key)}catch{return false}},[key]);
+  return useSyncExternalStore(subscribeReport,getSnapshot,()=>false);
+}
+export function TechnicalReportIndicator({number}:{number:string}){
+  const available=useTechnicalReportAvailable(number);
+  return available?<span title="Atendimento técnico preenchido e disponível neste navegador" aria-label="Atendimento técnico disponível" style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:19,height:19,borderRadius:"50%",background:"#059669",color:"white",fontSize:13,fontWeight:800,flexShrink:0,boxShadow:"0 0 0 2px #ecfdf5"}}>✓</span>:null;
+}
+export function TechnicalReportButton({number,onClick}:{number:string;onClick:()=>void}){
+  const available=useTechnicalReportAvailable(number);
+  return <button type="button" onClick={onClick} title={available?"Abrir atendimento técnico disponível":"Abrir atendimento técnico não preenchido"} style={{border:0,borderRadius:9,padding:"10px 12px",fontWeight:750,cursor:"pointer",background:available?"#15803d":"#64748b",color:"white",display:"inline-flex",gap:6,alignItems:"center",justifyContent:"center",whiteSpace:"nowrap",fontSize:12}}><Wrench size={15}/> ATEND. TÉCNICO {available?"✓":""}</button>;
+}
 const readableDate=(value?:string)=>value?new Date(value).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):"Não registrado";
 const escapeHtml=(s:string)=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]||c));
 const validImage=(s:string)=>/^data:image\/(?:jpeg|png|webp);base64,[a-zA-Z0-9+/=]+$/.test(s);
 function imageData(file:File):Promise<string>{return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(Error("Não foi possível ler a foto."));reader.onload=()=>{const img=new Image();img.onerror=()=>reject(Error("Formato de foto não suportado."));img.onload=()=>{const scale=Math.min(1,1000/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));const ctx=canvas.getContext("2d");if(!ctx)return reject(Error("Falha ao preparar imagem."));ctx.drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",0.65))};img.src=String(reader.result)};reader.readAsDataURL(file)})}
 function printReport(ticket:AppTicket,report:Report){const date=report.savedAt||ticket.serviceFinishedAt||ticket.serviceStartedAt;const html=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"/><title>OS - ${escapeHtml(ticket.number)}</title><style>body{font:14px Arial,sans-serif;color:#172b45;margin:30px}header{border-bottom:3px solid #163c6c;padding-bottom:12px;margin-bottom:20px}h1{font-size:22px}h2{font-size:15px;background:#ecf2fa;padding:9px;margin-top:25px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{padding:9px;border:1px solid #d4deeb;border-radius:5px;white-space:pre-wrap;overflow-wrap:anywhere}.lbl{font-size:10px;color:#5f728a;text-transform:uppercase;display:block;margin-bottom:5px}.gallery{display:flex;flex-wrap:wrap;gap:10px}.gallery img{max-width:48%;max-height:300px;object-fit:contain;page-break-inside:avoid;border:1px solid #ddd}.note{margin-top:25px;font-size:10px;color:#778}@media print{button{display:none}}</style></head><body><header><h1>ORDEM DE SERVIÇO — ATENDIMENTO TÉCNICO</h1><b>Chamado ${escapeHtml(ticket.number)}</b></header><div class="grid"><div class="field"><span class="lbl">Filial</span>${escapeHtml(ticket.branch||"Não informada")}</div><div class="field"><span class="lbl">Cidade / UF</span>${escapeHtml(ticket.city||"—")} / ${escapeHtml(ticket.uf||"—")}</div><div class="field"><span class="lbl">Técnico</span>${escapeHtml(ticket.tech||report.author||"Não informado")}</div><div class="field"><span class="lbl">Analista responsável</span>${escapeHtml(ticket.analistaResponsavel||ticket.analyst||"Não definido")}</div><div class="field"><span class="lbl">Início do atendimento</span>${escapeHtml(readableDate(ticket.serviceStartedAt))}</div><div class="field"><span class="lbl">Fim do atendimento</span>${escapeHtml(readableDate(ticket.serviceFinishedAt))}</div><div class="field"><span class="lbl">Situação</span>${escapeHtml(ticket.technicianStatus||ticket.status)}</div><div class="field"><span class="lbl">Registro salvo em</span>${escapeHtml(readableDate(date))}</div></div><h2>Solicitação original</h2><div class="field">${escapeHtml(ticket.desc||"—")}</div><h2>Descrição do serviço executado</h2><div class="field">${escapeHtml(report.description||"Não informada")}</div><h2>Materiais / peças utilizados</h2><div class="field">${escapeHtml(report.materials||"Nenhum material informado")}</div><h2>Registro fotográfico</h2><div class="gallery">${report.photos.filter(validImage).map(p=>`<img src="${p}" alt="Foto do atendimento"/>`).join("")||"Sem fotografias"}</div><div class="note">Relatório gerado pelo RotaSmart. Verifique os dados antes de utilizar como documento oficial.</div><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),500))<\/script></body></html>`;const frame=document.createElement("iframe");frame.style.position="fixed";frame.style.width="1px";frame.style.height="1px";frame.style.border="0";frame.style.opacity="0";frame.setAttribute("title","Impressão da OS");document.body.appendChild(frame);const doc=frame.contentDocument;if(!doc){frame.remove();alert("Não foi possível abrir a impressão.");return}doc.open();doc.write(html);doc.close();setTimeout(()=>frame.remove(),120000)}
 
-export default function TechnicalReport({ticket,mode}:Props){
+export default function TechnicalReport({ticket,mode,hideTrigger=false,expanded}:Props){
  const [open,setOpen]=useState(false);const [report,setReport]=useState<Report|null>(null);const [description,setDescription]=useState("");const [materials,setMaterials]=useState("");const [photos,setPhotos]=useState<string[]>([]);const [editing,setEditing]=useState(mode==="technician");const [error,setError]=useState("");const key=storageKey(ticket.number);
  const reload=useCallback(()=>{try{const raw=localStorage.getItem(key);const rec=raw?JSON.parse(raw) as Report:null;setReport(rec);setDescription(rec?.description||"");setMaterials(rec?.materials||"");setPhotos(rec?.photos||[])}catch{setError("Erro ao carregar o registro técnico.")}},[key]);
  useEffect(()=>{reload();setEditing(mode==="technician")},[reload,mode]);
- const attended=!!report||["atendido","concluido"].includes((ticket.technicianStatus||"").toLowerCase());
+ const attended=!!report;
+ const visible=expanded===undefined?open:expanded;
  const canEdit=mode==="technician"||editing;
- const save=()=>{if(!description.trim()){setError("Descreva o serviço realizado antes de salvar.");return}const rec:Report={description:description.trim(),materials:materials.trim(),photos,savedAt:new Date().toISOString(),author:ticket.tech||""};try{localStorage.setItem(key,JSON.stringify(rec));setReport(rec);setError("");if(mode==="viewer")setEditing(false)}catch{setError("Espaço do navegador insuficiente. Reduza/remova fotos e tente novamente.")}};
+ const save=()=>{if(!description.trim()){setError("Descreva o serviço realizado antes de salvar.");return}const rec:Report={description:description.trim(),materials:materials.trim(),photos,savedAt:new Date().toISOString(),author:ticket.tech||""};try{localStorage.setItem(key,JSON.stringify(rec));setReport(rec);window.dispatchEvent(new Event(REPORT_EVENT));setError("");if(mode==="viewer")setEditing(false)}catch{setError("Espaço do navegador insuficiente. Reduza/remova fotos e tente novamente.")}};
  const addPhotos=async(files:FileList|null)=>{if(!files)return;setError("");if(photos.length+files.length>5){setError("Máximo de 5 fotos por atendimento.");return}try{const next=await Promise.all(Array.from(files).map(f=>{if(!f.type.startsWith("image/"))throw Error("Selecione apenas imagens.");return imageData(f)}));setPhotos(v=>[...v,...next])}catch(e){setError(e instanceof Error?e.message:"Não foi possível adicionar as fotos.")}};
  const blockStyle:React.CSSProperties={border:"1px solid #d9e3f0",borderRadius:12,padding:13,margin:"12px 0",background:"#fff",color:"#183453"};
  const fieldStyle:React.CSSProperties={display:"block",width:"100%",minHeight:78,marginTop:6,padding:10,border:"1px solid #cbd5e1",borderRadius:8,font:"inherit",color:"#23364f",background:canEdit?"#fff":"#f2f5f9"};
  return <section style={{margin:"14px 0",width:"100%"}}>
   <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-   <button type="button" onClick={()=>setOpen(v=>!v)} style={{border:0,borderRadius:9,padding:"10px 14px",fontWeight:800,cursor:"pointer",background:attended?"#168451":"#64748b",color:"white",display:"flex",gap:6,alignItems:"center"}}><Wrench size={16}/> ATEND. TÉCNICO {attended?"✓":""}</button>
-   {open&&mode==="viewer"&&report&&<button type="button" title="Editar registro" onClick={()=>setEditing(v=>!v)} style={{padding:"9px 12px",border:"1px solid #cbd5e1",borderRadius:8,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}><Pencil size={14}/>{editing?"Concluir edição":"Editar"}</button>}
-   {open&&report&&<button type="button" onClick={()=>printReport(ticket,report)} style={{padding:"9px 12px",border:"1px solid #cbd5e1",borderRadius:8,cursor:"pointer",display:"flex",gap:5,alignItems:"center"}}><Printer size={14}/> Imprimir / PDF</button>}
+   {!hideTrigger&&<TechnicalReportButton number={ticket.number} onClick={()=>setOpen(v=>!v)}/>}
+   {visible&&mode==="viewer"&&report&&<button type="button" title="Editar registro" onClick={()=>setEditing(v=>!v)} style={{padding:"9px 12px",border:"1px solid #cbd5e1",borderRadius:8,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}><Pencil size={14}/>{editing?"Concluir edição":"Editar"}</button>}
+   {visible&&report&&<button type="button" onClick={()=>printReport(ticket,report)} style={{padding:"9px 12px",border:"1px solid #cbd5e1",borderRadius:8,cursor:"pointer",display:"flex",gap:5,alignItems:"center"}}><Printer size={14}/> Imprimir / PDF</button>}
   </div>
-  {open&&<div style={blockStyle}>
+  {visible&&<div style={blockStyle}>
    <div style={{fontSize:12,color:"#61748c",display:"flex",alignItems:"center",gap:6}}><FileText size={15}/>{report?`Registro salvo em ${readableDate(report.savedAt)}`:"Nenhum atendimento técnico preenchido ainda"}</div>
    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:8,marginTop:12}}>
     {[['Chamado',ticket.number],['Filial',ticket.branch||'Não informada'],['Cidade',ticket.city||'Não informada'],['Técnico',ticket.tech||'Não definido'],['Analista',ticket.analistaResponsavel||ticket.analyst||'Não definido'],['Início',readableDate(ticket.serviceStartedAt)],['Fim',readableDate(ticket.serviceFinishedAt)]].map(([k,v])=><div key={k} style={{background:"#f1f5f9",borderRadius:7,padding:8,fontSize:12}}><b style={{display:"block",color:"#65758b",fontSize:10}}>{k}</b>{v}</div>)}

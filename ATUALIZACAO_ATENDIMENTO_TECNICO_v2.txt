@@ -1,0 +1,22 @@
+ROTASMART — ATENDIMENTO TÉCNICO v2 (DEMONSTRAÇÃO)
+
+Alterações
+1. O botão ATEND. TÉCNICO fica no cabeçalho da edição do chamado, à direita.
+2. No Kanban e no Planner aparece um círculo verde com ✓ quando o relatório técnico daquele chamado foi salvo NESTE navegador.
+3. O Portal do Técnico exibe a Ordem de Serviço aberta, com descrição, materiais, fotos e botão de imprimir/salvar em PDF.
+4. Início, fim, conclusão técnica e pendências seguem disponíveis abaixo da OS.
+5. O número do chamado continua protegido no formulário administrativo após criação.
+6. Removidos arquivos duplicados na raiz e necessidade de scripts que alterem arquivos durante o build.
+
+ATENÇÃO: o armazenamento técnico continua localStorage: não sincroniza entre celular e computador. O indicador ✓ não é notificação remota. Para a versão corporativa, será necessário persistir OS, fotos e status em backend autorizado, e auditar permissões.
+
+PUBLICAÇÃO
+- Faça backup do repositório GitHub atual antes de substituir arquivos.
+- Extraia este ZIP (o GitHub não executa/extrai automaticamente o arquivo .zip).
+- Suba o CONTEÚDO extraído para a raiz do repositório, preservando app/, supabase/, etc.
+- Apague do repositório, se existirem, os arquivos duplicados na raiz TechnicalReport.tsx e apply-technical-report.cjs, e scripts/apply-technical-report.cjs (script legado). O projeto não depende deles.
+- Faça commit e valide o novo deployment na Vercel. Mantenha uma versão anterior Ready para rollback.
+
+VERIFICAÇÃO
+- Sintaxe TypeScript/TSX de app/page.tsx, app/components/TechnicalReport.tsx e app/components/TechnicianPortal.tsx: verificada.
+- Build completo Next.js: NÃO executado no ambiente de empacotamento por ausência de dependências instaladas.
