@@ -1,0 +1,21 @@
+ROTASMART — PACOTE COMPLETO COM ATENDIMENTO TÉCNICO
+
+1. Faça backup do repositório GitHub atual.
+2. Extraia este ZIP. A pasta interna representa a raiz do projeto GitHub.
+3. Substitua os arquivos do repositório pelos arquivos correspondentes deste pacote, preservando caminhos e pastas.
+4. Os arquivos antigos TechnicalReport.tsx e apply-technical-report.cjs na raiz não fazem parte deste ZIP; remova-os do GitHub quando possível. O tsconfig também exclui TechnicalReport.tsx da raiz da checagem de tipos, evitando o erro anterior caso ele ainda esteja lá.
+5. Confira no GitHub que package.json usa 'next build', sem script de remendo.
+6. Confirme na Vercel que o deployment ficou Ready e teste as telas.
+
+FUNCIONALIDADE NOVA
+Chamados: botão ATEND. TÉCNICO no cabeçalho do editor, cinza antes do preenchimento e verde com registro/status de atendimento.
+Visualização das informações do técnico; alteração por lápis; descrição, materiais, fotos (até 5) e impressão para PDF.
+Portal Técnico: o mesmo formulário aparece dentro do atendimento.
+O número do chamado fica apenas leitura após criação.
+Os horários de início e fim vêm dos registros de atendimento.
+
+LIMITAÇÕES IMPORTANTES
+Este RotaSmart está operando atualmente em modo local. Os dados e as fotos do atendimento técnico são guardados pelo navegador em localStorage: não se sincronizam automaticamente entre celular e desktop, e podem ser apagados ao limpar dados locais. Não trate como OS corporativa definitiva.
+Os novos anexos não integram o backup geral do aplicativo. Evite inserir dados internos reais na versão pública de demonstração.
+O PDF é gerado pela janela de impressão do navegador (Salvar como PDF), não por um serviço de servidor.
+Não foi possível executar o comando npm/pnpm build neste ambiente porque as dependências não estão disponíveis localmente. Foram realizadas validações estáticas e de estrutura.
