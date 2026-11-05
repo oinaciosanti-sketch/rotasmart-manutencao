@@ -3,12 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@10.34.5",
-  "engines": {
-    "node": "24.x"
-  },
+  "engines": {"node":"24.x"},
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/apply-technical-report.cjs && next dev",
+    "build": "node scripts/apply-technical-report.cjs && next build",
     "start": "next start"
   },
   "dependencies": {
