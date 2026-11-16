@@ -69,7 +69,7 @@ function AppShell() {
   if(role==="tecnico"||mobileMode)return <TechnicianPortal desktop={!mobileMode} onToggleMode={toggleMode}/>;
   return <div className={`app role-${role}${cloudBusy?" cloud-busy":""}`} aria-busy={cloudBusy}>
     <aside className="sidebar">
-      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 8.3</span></div></div>
+      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 8.4</span></div></div>
       <nav>{visibleMenu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>setPage(label)}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
       <div className="side-bottom"><button onClick={()=>setPage("Configurações")}><CircleHelp size={18}/>Configurações e backup</button>{can(role,"local.clear")&&<button onClick={clearLocalData}><Settings size={18}/>Limpar dados locais</button>}
         <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>void signOut()} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
