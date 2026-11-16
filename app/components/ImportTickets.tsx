@@ -14,7 +14,7 @@ const DEFAULT_SCOPE='__SELECT__';
 const get=(r:MovideskRecord,name:string)=>String(r[norm(name)]||'').trim();
 const code=(v:string)=>v.replace(/^#/, '').trim();
 function iso(date:string){const m=date.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}${m[4]?`T${m[4].padStart(2,'0')}:${m[5]}:00`:''}`;return date||undefined;}
-function internalStatus(value:string):AppTicket['status']{const x=norm(value);if(x.includes('cancel'))return 'Cancelado';if(x.includes('fech'))return 'Fechado';if(x.includes('conclu'))return 'Concluído';if(x.includes('resolv'))return 'Em atendimento';if(x.includes('atendimento'))return 'Em atendimento';if(x.includes('planejad')||x.includes('programad'))return 'Programado';if(x.includes('compra'))return 'Aguardando compra';if(x.includes('entrega'))return 'Aguardando entrega';return 'Novo';}
+function internalStatus(value:string):AppTicket['status']{const x=norm(value);if(x.includes('cancel'))return 'Cancelado';if(x.includes('fech'))return 'Concluído';if(x.includes('conclu'))return 'Concluído';if(x.includes('resolv'))return 'Em atendimento';if(x.includes('atendimento'))return 'Em atendimento';if(x.includes('planejad')||x.includes('programad'))return 'Programado';if(x.includes('compra'))return 'Aguardando compra';if(x.includes('entrega'))return 'Aguardando entrega';return 'Novo';}
 const urgency=(s:string):AppTicket['urgency']=>norm(s).includes('alt')||norm(s).includes('crit')?'Alta':norm(s).includes('baix')?'Baixa':'Média';
 function lookupBranch(r:MovideskRecord,branches:Filial[]){
  const explicit=get(r,'Filial - Posto/Ponto')||get(r,'Filial - Postos/Bases')||get(r,'Filial / Empresa');
@@ -30,7 +30,7 @@ function buildTicket(r:MovideskRecord,branches:Filial[],index:number):AppTicket{
 function merged(old:AppTicket,incoming:AppTicket):AppTicket{
  // Somente os campos de origem são sincronizados; planejamento, histórico e notas locais não podem ser apagados.
  const planned=old.planningStatus==='rota_confirmada'||old.planningStatus==='em_rota_rascunho';
- const status=old.status==='Concluído'||old.status==='Fechado'||old.status==='Cancelado'||planned?old.status:incoming.status;
+ const preserved=old.status==='Fechado'?'Concluído':old.status;const status=preserved==='Concluído'||preserved==='Cancelado'||planned?preserved:incoming.status;
  return {...old,branch:incoming.branch==='Filial não informada'?old.branch:incoming.branch,branchId:incoming.branchId||old.branchId,branchNumber:incoming.branchNumber||old.branchNumber,branchCnpj:incoming.branchCnpj||old.branchCnpj,city:incoming.city==='Cidade não informada'?old.city:incoming.city,address:incoming.address==='Endereço não informado'?old.address:incoming.address,latitude:isValidCoordinate(incoming.latitude,incoming.longitude)?incoming.latitude:old.latitude,longitude:isValidCoordinate(incoming.latitude,incoming.longitude)?incoming.longitude:old.longitude,desc:incoming.desc==='Sem descrição'?old.desc:incoming.desc,status,sourceStatus:incoming.sourceStatus,urgency:incoming.urgency,openedAt:incoming.openedAt||old.openedAt,analyst:incoming.analyst,analistaResponsavel:incoming.analistaResponsavel,sourceFields:{...old.sourceFields,...incoming.sourceFields,branchRaw:incoming.sourceFields?.branchRaw||old.sourceFields?.branchRaw||''},sourceImportedAt:incoming.sourceImportedAt,reviewBranch:incoming.branchId?false:old.reviewBranch||incoming.reviewBranch};
 }
 export default function ImportTickets({flash}:{flash:(m:string)=>void}){
