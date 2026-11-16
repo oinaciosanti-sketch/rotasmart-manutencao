@@ -23,19 +23,40 @@ export default function TechnicalReport({ticket,mode}:Props){
  const addPhotos=async(files:FileList|null)=>{if(!files)return;setError("");if(photos.length+files.length>5){setError("Máximo de 5 fotos por atendimento.");return}try{const next=await Promise.all(Array.from(files).map(f=>{if(!f.type.startsWith("image/"))throw Error("Selecione apenas imagens.");return imageData(f)}));setPhotos(v=>[...v,...next])}catch(e){setError(e instanceof Error?e.message:"Não foi possível adicionar as fotos.")}};
  const blockStyle:React.CSSProperties={border:"1px solid #b7d1f4",borderRadius:12,padding:13,margin:"12px 0",background:"#eaf3ff",color:"#183453",boxShadow:"0 4px 18px rgba(33,93,169,.10)"};
  const fieldStyle:React.CSSProperties={display:"block",width:"100%",minHeight:78,marginTop:6,padding:10,border:"1px solid #cbd5e1",borderRadius:8,font:"inherit",color:"#23364f",background:canEdit?"#fff":"#f2f5f9"};
- return <section className="rs-technical-report-v83" style={{margin:"14px 0",width:"100%"}}>
+ return <section className="rs-technical-report-v84" style={{margin:"14px 0",width:"100%"}}>
   <style>{`
+    /* VERSION 8.4 — botão técnico e fechar não competem pelo mesmo espaço. */
     .ticket-modal { position: relative; }
-    .ticket-modal .tech-modal-head { padding-right: 220px; }
-    .ticket-modal .rs-technical-toolbar-v83 > button:first-child { position: absolute; top: 16px; right: 62px; z-index: 5; background: #265fad !important; box-shadow: 0 2px 9px rgba(26,63,120,.18); }
-    .ticket-modal .rs-technical-report-v83 > div:nth-of-type(2) { background: #eaf3ff; border-color: #b7d1f4; }
+    .ticket-modal .tech-modal-head { position: relative; padding-right: 255px; min-height: 77px; }
+    .ticket-modal .tech-modal-head > button:last-child {
+      position: absolute !important;
+      top: 16px !important;
+      right: 16px !important;
+      left: auto !important;
+      margin: 0 !important;
+      z-index: 30;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+    }
+    .ticket-modal .rs-technical-toolbar-v84 > button:first-child {
+      position: absolute;
+      top: 16px;
+      right: 64px;
+      z-index: 10;
+      margin: 0;
+      box-shadow: 0 2px 9px rgba(26,63,120,.18);
+      white-space: nowrap;
+    }
     @media (max-width: 760px) {
-      .ticket-modal .tech-modal-head { padding-right: 40px; }
-      .ticket-modal .rs-technical-toolbar-v83 > button:first-child { position: static; }
+      .ticket-modal .tech-modal-head { padding-right: 52px; min-height: 72px; }
+      .ticket-modal .rs-technical-toolbar-v84 > button:first-child { position: static; }
     }
   `}</style>
-  <div className="rs-technical-toolbar-v83" style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-   <button type="button" onClick={()=>setOpen(v=>!v)} style={{border:0,borderRadius:9,padding:"10px 14px",fontWeight:800,cursor:"pointer",background:attended?"#168451":"#64748b",color:"white",display:"flex",gap:6,alignItems:"center"}}><Wrench size={16}/> ATEND. TÉCNICO {attended?"✓":""}</button>
+  <div className="rs-technical-toolbar-v84" style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+   <button type="button" onClick={()=>setOpen(v=>!v)} style={{border:0,borderRadius:9,padding:"10px 14px",fontWeight:800,cursor:"pointer",background:attended?"#168451":"#265fad",color:"white",display:"flex",gap:6,alignItems:"center"}}><Wrench size={16}/> ATEND. TÉCNICO {attended?"✓":""}</button>
    {open&&mode==="viewer"&&report&&<button type="button" title="Editar registro" onClick={()=>setEditing(v=>!v)} style={{padding:"9px 12px",border:"1px solid #cbd5e1",borderRadius:8,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}><Pencil size={14}/>{editing?"Concluir edição":"Editar"}</button>}
    {open&&report&&<button type="button" onClick={()=>printReport(ticket,report)} style={{padding:"9px 12px",border:"1px solid #cbd5e1",borderRadius:8,cursor:"pointer",display:"flex",gap:5,alignItems:"center"}}><Printer size={14}/> Imprimir / PDF</button>}
   </div>
