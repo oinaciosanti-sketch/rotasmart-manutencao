@@ -1,0 +1,21 @@
+ROTASMART - ATENDIMENTO TECNICO V8.3
+
+O que muda:
+- Botao ATEND. TECNICO aparece no canto superior direito da janela de chamado, proximo ao titulo e ao botao Fechar.
+- Quando abrir, o bloco ganha fundo azul-claro e borda azul suave.
+- Em celular, o botao permanece no fluxo normal para nao cobrir o titulo.
+- Nenhum dado armazenado e alterado.
+
+COMO APLICAR:
+1. Faca backup do GitHub e do RotaSmart.
+2. No GitHub, escolha Code > Download ZIP e extraia uma copia ATUAL do projeto completo.
+3. Copie os arquivos deste pacote (aplicar_atualizacao.py e APLICAR_V83_WINDOWS.bat) para a RAIZ dessa copia, onde existe a pasta app.
+4. Execute APLICAR_V83_WINDOWS.bat. Precisa ter Python 3 instalado.
+5. Verifique a mensagem 'SUCESSO'. O arquivo anterior vira TechnicalReport.tsx.bak-before-v83 (nao envie o .bak ao GitHub).
+6. No GitHub, substitua SOMENTE app/components/TechnicalReport.tsx pelo arquivo atualizado dessa copia.
+7. Faca commit e aguarde o deploy Ready na Vercel. Abra um chamado e teste o botao e o fundo.
+
+ATENCAO: Nao carregue os arquivos na raiz do GitHub. Nao envie o script nem o backup .bak. O ZIP e um atualizador, nao e o projeto completo.
+Se a estrutura do projeto estiver diferente, o script interrompe antes de gravar.
+
+VALIDACAO: as substituicoes sao checadas por contagem antes de gravar. Nao foi executado um build real Next.js nem teste em navegador neste ambiente.
