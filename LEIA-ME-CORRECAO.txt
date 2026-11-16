@@ -1,0 +1,9 @@
+RotaSmart Correção V3
+
+Corrige apenas o erro TypeScript em app/components/OperationalMap.tsx linha 14: propriedade latitude inexistente em tipo string | Filial.
+
+No GitHub: substitua somente app/components/OperationalMap.tsx pelo arquivo desta pasta. Nao substitua as demais pastas nem remova os arquivos existentes. Faça commit e confira novo deploy na Vercel.
+
+Warnings de cache Webpack e de flex-end/flex-start no CSS nao impedem o build.
+
+A correção foi revisada estaticamente; build completo ainda precisa ser validado na Vercel.
