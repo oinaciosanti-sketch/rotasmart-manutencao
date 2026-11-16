@@ -1,19 +1,42 @@
-RotaSmart V7 — CORREÇÃO FILIAIS E ENDEREÇOS
+ROTASMART V8.1 — FILIAIS REAIS E CORREÇÃO DOS VÍNCULOS
+========================================================
 
-ATUALIZAÇÃO PARCIAL PARA O PROJETO V6 EXISTENTE. Não envie os arquivos para a raiz indiscriminadamente.
+ESTE ZIP É UMA ATUALIZAÇÃO, NÃO UM REPOSITÓRIO COMPLETO.
 
-1) Faça backup dos dados pelo RotaSmart em Configurações e do repositório no GitHub.
-2) Extraia o ZIP preservando a hierarquia de pastas.
-3) Substitua exatamente:
-   app/utils/branchEnrichment.ts (arquivo novo)
-   app/data/AppDataContext.tsx
-   app/components/ImportTickets.tsx
-4) No GitHub, confirme os caminhos e que não há cópia solta na raiz.
-5) Commit e verifique o build da Vercel.
-6) Entre em Importar chamados. Use o botão Reconciliar endereços agora e confirme os números.
-7) Confira um chamado cujo endereço estava não informado.
-8) Faça nova importação do Movidesk: o cadastro deve ser consultado por filial.
+ARQUIVOS (com caminhos exatos):
+ app/components/ImportTickets.tsx      SUBSTITUIR
+ app/components/PostosBoard.tsx        SUBSTITUIR
+ app/utils/branchEnrichment.ts        ADICIONAR ou SUBSTITUIR
+ app/page.tsx                          SUBSTITUIR (somente se for a V6 existente)
 
-IMPORTANTE: não foram adicionadas coordenadas de GPS fictícias. O mapa só posiciona filiais com coordenadas validadas.
-Backup: um backup anterior à reconciliação é guardado no localStorage 'rotasmart-pre-reconcile-backup' caso haja espaço; faça também um backup manual em Configurações antes de atualizar.
-Limitação: verificação sintática/TypeScript isolada não equivale a build Next.js/Vercel.
+1. Exporte um BACKUP do RotaSmart em Configurações e guarde uma cópia do GitHub.
+2. Extraia o ZIP no computador. Não envie o ZIP fechado ao GitHub.
+3. Abra o REPOSITÓRIO na raiz e atualize os arquivos nos caminhos ACIMA.
+   GitHub Upload files somente preserva pastas se elas estiverem devidamente estruturadas.
+   Confirme que NÃO existem arquivos .tsx duplicados na raiz.
+4. Antes do commit, abra app/components/ImportTickets.tsx no GitHub e procure
+   "Corrigir vínculos e endereços — V8.1"; abra app/page.tsx e procure
+   "safeBranchLabel". Se não aparecerem, a versão não foi substituída.
+5. Faça commit e confira o novo deploy na Vercel. Não reimporte seus chamados antes
+   de fazer o BACKUP.
+6. No RotaSmart, entre em Importar chamados e clique
+   "Corrigir vínculos e endereços". Só confirme após revisar a contagem.
+7. Abra Kanban/Planner/Postos e confira números das filiais e endereços.
+
+O QUE A ATUALIZAÇÃO FAZ
+- Reconhece o padrão real Movidesk "031 - AEROPORTO", "019 - TERMINAL NORTE".
+- Vincula pelo código oficial quando há correspondência inequívoca.
+- Não confunde número do chamado com código da filial.
+- Mantém os registros MV antigos no banco para possível conferência; NÃO os
+  converte inventando um número nem os exclui automaticamente.
+- Mostra apenas "FL 31", etc. quando o vínculo é seguro, ou
+  "Filial a conferir" quando ainda estiver indefinido.
+- A aba Filiais oculta provisórios MV por padrão; há opção para exibi-los.
+- Mantém rotas, status, histórico e anotações nos chamados.
+- Novo arquivo repetido é atualizado pelo NÚMERO DO CHAMADO, não duplicado.
+
+LIMITAÇÕES
+- O cadastro mestre deve conter o código da filial real.
+- Tickets sem código claro exigem atribuição manual.
+- Verificação local de sintaxe não substitui build da Vercel. Não publicar
+  dados empresariais em ambiente pessoal sem aprovação.
