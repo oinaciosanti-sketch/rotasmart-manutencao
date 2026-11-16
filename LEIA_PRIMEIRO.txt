@@ -1,42 +1,24 @@
-ROTASMART V8.1 — FILIAIS REAIS E CORREÇÃO DOS VÍNCULOS
-========================================================
+RotaSmart — VERSION 8.3 (identificador de versao + visual Atendimento Tecnico)
 
-ESTE ZIP É UMA ATUALIZAÇÃO, NÃO UM REPOSITÓRIO COMPLETO.
+ATENCAO: este ZIP e um ATUALIZADOR. Ele nao inclui os arquivos completos atuais do seu GitHub.
 
-ARQUIVOS (com caminhos exatos):
- app/components/ImportTickets.tsx      SUBSTITUIR
- app/components/PostosBoard.tsx        SUBSTITUIR
- app/utils/branchEnrichment.ts        ADICIONAR ou SUBSTITUIR
- app/page.tsx                          SUBSTITUIR (somente se for a V6 existente)
+PASSO A PASSO (Windows):
+1. No GitHub do RotaSmart, clique em Code > Download ZIP. Extraia o projeto atual.
+2. Extraia este pacote V8.3 em uma pasta a parte.
+3. No seu computador, execute o Prompt de Comando na pasta do atualizador e digite:
+   py -3 APLICAR_VERSION_8_3.py "C:\CAMINHO\DA\PASTA\DO\REPOSITORIO"
+   (Substitua pelo caminho real da pasta do projeto extraido; Python 3 necessario.)
+   Alternativamente, arraste a pasta do projeto para o .BAT.
+4. Se aparecer SUCESSO, abra o arquivo do projeto app/page.tsx e procure por VERSION 8.3.
+   Abra app/components/TechnicalReport.tsx e procure por rs-technical-report-v83.
+   Se os DOIS marcadores estiverem presentes, a atualizacao foi aplicada ao projeto local.
+5. GitHub: edite/substitua SOMENTE estes caminhos:
+   app/page.tsx
+   app/components/TechnicalReport.tsx
+   NAO crie arquivos na raiz do GitHub. Nao envie backups nem script.
+6. Confirme os commits, aguarde Ready na Vercel, e atualize com Ctrl + Shift + R.
+7. Na barra lateral, logo abaixo de RotaSmart, deve aparecer VERSION 8.3.
+   Abra um chamado: botao ATEND. TECNICO no alto, painel aberto em azul-claro.
 
-1. Exporte um BACKUP do RotaSmart em Configurações e guarde uma cópia do GitHub.
-2. Extraia o ZIP no computador. Não envie o ZIP fechado ao GitHub.
-3. Abra o REPOSITÓRIO na raiz e atualize os arquivos nos caminhos ACIMA.
-   GitHub Upload files somente preserva pastas se elas estiverem devidamente estruturadas.
-   Confirme que NÃO existem arquivos .tsx duplicados na raiz.
-4. Antes do commit, abra app/components/ImportTickets.tsx no GitHub e procure
-   "Corrigir vínculos e endereços — V8.1"; abra app/page.tsx e procure
-   "safeBranchLabel". Se não aparecerem, a versão não foi substituída.
-5. Faça commit e confira o novo deploy na Vercel. Não reimporte seus chamados antes
-   de fazer o BACKUP.
-6. No RotaSmart, entre em Importar chamados e clique
-   "Corrigir vínculos e endereços". Só confirme após revisar a contagem.
-7. Abra Kanban/Planner/Postos e confira números das filiais e endereços.
-
-O QUE A ATUALIZAÇÃO FAZ
-- Reconhece o padrão real Movidesk "031 - AEROPORTO", "019 - TERMINAL NORTE".
-- Vincula pelo código oficial quando há correspondência inequívoca.
-- Não confunde número do chamado com código da filial.
-- Mantém os registros MV antigos no banco para possível conferência; NÃO os
-  converte inventando um número nem os exclui automaticamente.
-- Mostra apenas "FL 31", etc. quando o vínculo é seguro, ou
-  "Filial a conferir" quando ainda estiver indefinido.
-- A aba Filiais oculta provisórios MV por padrão; há opção para exibi-los.
-- Mantém rotas, status, histórico e anotações nos chamados.
-- Novo arquivo repetido é atualizado pelo NÚMERO DO CHAMADO, não duplicado.
-
-LIMITAÇÕES
-- O cadastro mestre deve conter o código da filial real.
-- Tickets sem código claro exigem atribuição manual.
-- Verificação local de sintaxe não substitui build da Vercel. Não publicar
-  dados empresariais em ambiente pessoal sem aprovação.
+Se o sistema nao mostrar a versao, o GitHub nao recebeu o app/page.tsx atualizado ou a Vercel ainda nao publicou o commit.
+Nenhum dado de chamado e alterado por este pacote.
