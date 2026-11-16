@@ -1,0 +1,19 @@
+RotaSmart V7 — CORREÇÃO FILIAIS E ENDEREÇOS
+
+ATUALIZAÇÃO PARCIAL PARA O PROJETO V6 EXISTENTE. Não envie os arquivos para a raiz indiscriminadamente.
+
+1) Faça backup dos dados pelo RotaSmart em Configurações e do repositório no GitHub.
+2) Extraia o ZIP preservando a hierarquia de pastas.
+3) Substitua exatamente:
+   app/utils/branchEnrichment.ts (arquivo novo)
+   app/data/AppDataContext.tsx
+   app/components/ImportTickets.tsx
+4) No GitHub, confirme os caminhos e que não há cópia solta na raiz.
+5) Commit e verifique o build da Vercel.
+6) Entre em Importar chamados. Use o botão Reconciliar endereços agora e confirme os números.
+7) Confira um chamado cujo endereço estava não informado.
+8) Faça nova importação do Movidesk: o cadastro deve ser consultado por filial.
+
+IMPORTANTE: não foram adicionadas coordenadas de GPS fictícias. O mapa só posiciona filiais com coordenadas validadas.
+Backup: um backup anterior à reconciliação é guardado no localStorage 'rotasmart-pre-reconcile-backup' caso haja espaço; faça também um backup manual em Configurações antes de atualizar.
+Limitação: verificação sintática/TypeScript isolada não equivale a build Next.js/Vercel.
