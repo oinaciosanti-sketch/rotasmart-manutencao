@@ -1,0 +1,39 @@
+ROTASMART CONTROL — V8 — CORREÇÃO DE VÍNCULO DE FILIAIS
+
+OBJETIVO
+Reconhecer o código do posto que vem no campo "Filial - Posto/Ponto" do Movidesk.
+Exemplos reais do formato: "031 - AEROPORTO", "019 - TERMINAL NORTE", "042 - TREVO SUL 101".
+O número do CHAMADO é diferente do número da FILIAL e nunca será usado isoladamente como filial.
+
+ATUALIZAR SÓ 2 ARQUIVOS, NOS CAMINHOS CORRETOS:
+- app/components/ImportTickets.tsx (SUBSTITUIR)
+- app/utils/branchEnrichment.ts (CRIAR, se não existir; senão substituir)
+
+INSTRUÇÕES
+1. Antes de atualizar, exporte o backup JSON em Configurações do RotaSmart.
+2. No GitHub, confirme que está na branch de produção e abra a pasta app.
+3. Na pasta components, substitua ImportTickets.tsx pelo arquivo correspondente deste ZIP.
+4. Na pasta utils, envie branchEnrichment.ts.
+5. Confirme que NÃO existem cópias desses arquivos na raiz do repositório.
+6. Faça commit e aguarde o deploy Ready na Vercel.
+7. Abra o RotaSmart > Importar chamados > "Corrigir vínculos e endereços".
+8. Confira um chamado com filial 031 e outro com 019, para verificar o endereço.
+9. Se um chamado antigo perdeu a identificação original na primeira importação, importe novamente o CSV/Excel atualizado; a sincronização pelo número não duplica o chamado.
+10. Confira os resultados antes de usar a programação ou o mapa na operação.
+
+O QUE A V8 FAZ
+- Resolve corretamente filial com prefixo 001, 019, 031, 034 etc. seguido de nome.
+- Aceita ainda FL 34, POSTO 34, FILIAL 34, e formatos com número do ticket em campo separado.
+- Complementa cidade/endereço a partir do cadastro mestre quando há correspondência única.
+- Corrige os registros existentes ao clicar no botão, criando backup antes.
+- Preserva número do chamado, prioridade, técnico, rota, status e anotações.
+- Não cria filiais fictícias quando não há correspondência; sinaliza para conferência.
+- Não exige reimportar todos os chamados quando a identificação original ainda está registrada.
+
+VALIDAÇÃO REALIZADA
+- Sintaxe TypeScript/TSX dos arquivos corrigidos: OK.
+- 13 verificações de identificação + preservação de planejamento: OK.
+- Amostra real de exportação anterior: 52 de 53 valores preenchidos de filial identificados. Um permanece para conferência.
+- Build Next.js completo e deploy Vercel: NÃO executados neste ambiente. Só o deploy publicado confirma compilação.
+
+IMPORTANTE: dados corporativos, utilização de extensões e armazenamento devem seguir as permissões da empresa.
