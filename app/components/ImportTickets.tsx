@@ -37,10 +37,10 @@ export default function ImportTickets({flash}:{flash:(m:string)=>void}){
  const [rows,setRows]=useState<MovideskRecord[]>([]),[file,setFile]=useState(''),[error,setError]=useState(''),[working,setWorking]=useState(false);
  const [owner,setOwner]=useState(DEFAULT_SCOPE),[includeClosed,setIncludeClosed]=useState(false),[showAll,setShowAll]=useState(false);
  const [history,setHistory]=useState<{date:string,file:string,inserted:number,updated:number,ignored:number}[]>([]);
- const owners=useMemo(()=>[...new Set(rows.map(r=>get(r,'Responsável')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')),[rows]);
+ const owners=useMemo(()=>Array.from(new Set(rows.map(r=>get(r,'Responsável')).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt-BR')),[rows]);
  const scope=useMemo(()=>rows.filter(r=>(owner==='__ALL__'||(owner!==DEFAULT_SCOPE&&get(r,'Responsável')===owner))&&(includeClosed||!closed.has(norm(get(r,'Status'))))),[rows,owner,includeClosed]);
  const known=useMemo(()=>new Set(tickets.map(t=>norm(t.number))),[tickets]);
- const preview=useMemo(()=>{let unique=new Map<string,MovideskRecord>(),duplicates=0,invalid=0;for(const r of scope){const n=code(get(r,'Número'));if(!/^\d{3,15}$/.test(n)){invalid++;continue}const k=norm(n);if(unique.has(k))duplicates++;unique.set(k,r)}const values=[...unique.values()];return {values,duplicates,invalid,fresh:values.filter(r=>!known.has(norm(get(r,'Número')))).length,updated:values.filter(r=>known.has(norm(get(r,'Número')))).length,unknown:values.filter(r=>!lookupBranch(r,branches).found).length}},[scope,known,branches]);
+ const preview=useMemo(()=>{let unique=new Map<string,MovideskRecord>(),duplicates=0,invalid=0;for(const r of scope){const n=code(get(r,'Número'));if(!/^\d{3,15}$/.test(n)){invalid++;continue}const k=norm(n);if(unique.has(k))duplicates++;unique.set(k,r)}const values=Array.from(unique.values());return {values,duplicates,invalid,fresh:values.filter(r=>!known.has(norm(get(r,'Número')))).length,updated:values.filter(r=>known.has(norm(get(r,'Número')))).length,unknown:values.filter(r=>!lookupBranch(r,branches).found).length}},[scope,known,branches]);
  const read=async(f:File|undefined)=>{if(!f)return;setFile(f.name);setError('');setRows([]);setOwner(DEFAULT_SCOPE);setWorking(true);try{const rec=await readMovideskFile(f);setRows(rec);if(!rec.length)throw Error('Exportação sem chamados.');}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setWorking(false)}};
  const importNow=()=>{
   if(owner===DEFAULT_SCOPE||!preview.values.length)return;

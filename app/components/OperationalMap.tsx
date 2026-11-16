@@ -12,7 +12,7 @@ export default function OperationalMap(){
  const active=tickets.filter(t=>!final.has(t.status));
  const pins=useMemo(()=>{const map=new Map<string,{key:string,name:string,lat:number,lon:number,city:string,items:typeof tickets}>();
   active.forEach(t=>{const b=branches.find(x=>x.id===t.branchId)||branches.find(x=>x.numeroFilial===t.branchNumber)||(t.branch&&branches.find(x=>x.nome===t.branch));const lat=isValidCoordinate(t.latitude,t.longitude)?t.latitude:b?.latitude,lon=isValidCoordinate(t.latitude,t.longitude)?t.longitude:b?.longitude;
-   if(!isValidCoordinate(lat,lon))return;const key=b?.numeroFilial||`${lat},${lon}`;let item=map.get(key);if(!item){item={key,name:b?.nome||t.branch,city:t.city,lat:lat!,lon:lon!,items:[]};map.set(key,item)}item.items.push(t) });return [...map.values()]},[active,branches]);
+   if(!isValidCoordinate(lat,lon))return;const key=b?.numeroFilial||`${lat},${lon}`;let item=map.get(key);if(!item){item={key,name:b?.nome||t.branch,city:t.city,lat:lat!,lon:lon!,items:[]};map.set(key,item)}item.items.push(t) });return Array.from(map.values())},[active,branches]);
  const missing=active.length-pins.reduce((n,p)=>n+p.items.length,0);
  return <div className="operational-map-screen"><div className="pagehead"><div><span className="eyebrow">Visão operacional · leitura de chamados importados</span><h1>Mapa dos chamados abertos</h1><p>Visualize concentração de atendimentos e oportunidades de encaixe nas rotas. Novos chamados aparecem após importar o arquivo atualizado.</p></div></div>
  <div className="op-map-kpis"><div><b>{active.length}</b><span>Chamados em aberto</span></div><div><b>{pins.length}</b><span>Filiais localizadas</span></div><div><b>{missing}</b><span>Sem coordenadas</span></div></div>
