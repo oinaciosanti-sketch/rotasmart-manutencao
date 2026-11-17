@@ -1,24 +1,28 @@
-RotaSmart — VERSION 8.3 (identificador de versao + visual Atendimento Tecnico)
+ROTASMART CONTROL — VERSION 8.5
 
-ATENCAO: este ZIP e um ATUALIZADOR. Ele nao inclui os arquivos completos atuais do seu GitHub.
+ESTA ATUALIZAÇÃO É LOCAL. NÃO ATIVA SINCRONIZAÇÃO, NÃO CONFIGURA SUPABASE E NÃO MUDA OS DADOS EXISTENTES.
 
-PASSO A PASSO (Windows):
-1. No GitHub do RotaSmart, clique em Code > Download ZIP. Extraia o projeto atual.
-2. Extraia este pacote V8.3 em uma pasta a parte.
-3. No seu computador, execute o Prompt de Comando na pasta do atualizador e digite:
-   py -3 APLICAR_VERSION_8_3.py "C:\CAMINHO\DA\PASTA\DO\REPOSITORIO"
-   (Substitua pelo caminho real da pasta do projeto extraido; Python 3 necessario.)
-   Alternativamente, arraste a pasta do projeto para o .BAT.
-4. Se aparecer SUCESSO, abra o arquivo do projeto app/page.tsx e procure por VERSION 8.3.
-   Abra app/components/TechnicalReport.tsx e procure por rs-technical-report-v83.
-   Se os DOIS marcadores estiverem presentes, a atualizacao foi aplicada ao projeto local.
-5. GitHub: edite/substitua SOMENTE estes caminhos:
-   app/page.tsx
-   app/components/TechnicalReport.tsx
-   NAO crie arquivos na raiz do GitHub. Nao envie backups nem script.
-6. Confirme os commits, aguarde Ready na Vercel, e atualize com Ctrl + Shift + R.
-7. Na barra lateral, logo abaixo de RotaSmart, deve aparecer VERSION 8.3.
-   Abra um chamado: botao ATEND. TECNICO no alto, painel aberto em azul-claro.
+INSTALAÇÃO PELO GITHUB — SEM SCRIPTS:
+1. Abra o ZIP e a pasta app.
+2. No seu repositório GitHub, abra app/page.tsx. Substitua o conteúdo pelo app/page.tsx deste ZIP e faça o commit.
+3. No GitHub, abra app/components/TechnicianPortal.tsx. Substitua o conteúdo pelo arquivo correspondente deste ZIP e faça o commit.
+4. No GitHub, entre em app/components e crie um arquivo chamado MobileAnalystPanel.tsx. Cole TODO o conteúdo do arquivo de mesmo nome deste ZIP e faça o commit.
+5. Espere a Vercel concluir (Ready) e atualize a página (Ctrl+Shift+R).
 
-Se o sistema nao mostrar a versao, o GitHub nao recebeu o app/page.tsx atualizado ou a Vercel ainda nao publicou o commit.
-Nenhum dado de chamado e alterado por este pacote.
+O QUE MUDA:
+- O botão de celular abre o MEU MOBILE, o painel local do analista.
+- Abas Meu Mobile / Visualizar Valdemir permitem alternar a visualização.
+- Meu Mobile exibe os chamados que já existem neste navegador, incluindo filtros e atalhos para telas de trabalho.
+- Portal do Valdemir mantém a própria tela e ganha aba ATRIBUÍDOS para visualizar serviços mesmo sem rota/data.
+- A conta com papel de tecnico continua abrindo seu portal tecnico individual.
+- Indicador da versão atualizado para V8.5.
+
+IMPORTANTE:
+- Nada do que é salvo no modo local de um navegador aparece automaticamente em outro aparelho.
+- A aba Visualizar Valdemir é apenas uma visualização administrativa local.
+- A atualização não importa chamados, não atribui técnicos e não sincroniza bases diferentes.
+- Para ver os chamados no portal do técnico, atribua-os a Valdemir em Chamados.
+- Faça um backup pelo painel Configurações antes de instalar a atualização.
+- Caso já existam mudanças posteriores em algum destes arquivos, compare antes de substituir.
+
+CHECAGEM REALIZADA: análise sintática TypeScript dos 3 arquivos. Build/deploy não executados neste ambiente.
