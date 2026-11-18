@@ -20,6 +20,7 @@ import PostosBoard from "./components/PostosBoard";
 import CloudMigrationPanel from "./components/CloudMigrationPanel";
 import UsersPage from "./components/UsersPage";
 import TechnicianPortal from "./components/TechnicianPortal";
+import MobileAnalystPanel from "./components/MobileAnalystPanel";
 import TechnicalReport from "./components/TechnicalReport";
 import { AccessStatusScreen, AuthLoading, LoginScreen, useAuth } from "./components/AuthProvider";
 import {can,type AppRole} from "./lib/permissions";
@@ -61,15 +62,23 @@ function AppShell() {
   const {tickets:appTickets,setTickets:setAppTickets,persistenceError,cloudStatus,clearLocalData}=useAppData();
   const {configured,user,profile,dataMode,signOut}=useAuth();
   const role:AppRole=profile?.role||(configured?"visualizador":"admin");const visibleMenu=menu.filter(item=>item.label!=="Usuários"||(configured&&can(role,"users.manage"))).filter(item=>item.label!=="Importar chamados"||can(role,"imports.run")).filter(item=>item.label!=="Montar rota"||can(role,"routes.create"));
-  const modeKey=`rotasmart-view-mode-${user?.id||"local"}`;const [mobileMode,setMobileMode]=useState(()=>role==="tecnico"||(typeof window!=="undefined"&&(localStorage.getItem(modeKey)==="mobile"||(window.innerWidth<720&&role!=="admin"&&role!=="analista"))));const toggleMode=()=>setMobileMode(current=>{const next=!current;localStorage.setItem(modeKey,next?"mobile":"desktop");return next});
+  const modeKey=`rotasmart-view-mode-${user?.id||"local"}`;
+  const [mobileMode,setMobileMode]=useState(()=>role==="tecnico"||(typeof window!=="undefined"&&(localStorage.getItem(modeKey)==="mobile"||(window.innerWidth<720&&role!=="admin"&&role!=="analista"))));
+  const [mobilePanel,setMobilePanel]=useState<"analista"|"tecnico">("analista");
+  const toggleMode=()=>setMobileMode(current=>{const next=!current;localStorage.setItem(modeKey,next?"mobile":"desktop");return next});
   const userName=profile?.nome||user?.email?.split("@")[0]||"Inácio Carvalho";const userInitials=userName.split(/\s+/).slice(0,2).map(part=>part[0]).join("").toUpperCase();
   const [toast,setToast]=useState("");
   const flash=(s:string)=>{setToast(s);setTimeout(()=>setToast(""),2600)};
   const openGlobalSearch=(value:string)=>{setSearch(value);if(value.trim())setPage("Chamados")};
-  if(role==="tecnico"||mobileMode)return <TechnicianPortal desktop={!mobileMode} onToggleMode={toggleMode}/>;
+  if(role==="tecnico")return <TechnicianPortal desktop={false} onToggleMode={toggleMode}/>;
+  if(mobileMode)return <div className="rs-v85-mobile-shell">
+    <style>{` .rs-v85-mobile-shell{min-height:100vh;background:#f3f6fb;color:#183453;font-family:inherit} .rs-v85-switch{position:sticky;top:0;z-index:110;background:#fff;border-bottom:1px solid #dbe5f1;display:flex;align-items:center;gap:7px;padding:10px 12px;box-shadow:0 2px 8px rgba(15,32,60,.08)} .rs-v85-switch button{border:1px solid #cfdae9;border-radius:9px;background:#fff;color:#294563;font-weight:700;font-size:12px;padding:10px;cursor:pointer} .rs-v85-switch button.rs-selected{background:#265fad;color:#fff;border-color:#265fad} .rs-v85-switch .rs-back{margin-left:auto} .rs-v85-switch .rs-v85-mode-label{font-size:11px;color:#687e96;white-space:nowrap} `}</style>
+    <div className="rs-v85-switch"><button className={mobilePanel==="analista"?"rs-selected":""} onClick={()=>setMobilePanel("analista")}>Meu Mobile</button><button className={mobilePanel==="tecnico"?"rs-selected":""} onClick={()=>setMobilePanel("tecnico")}>Visualizar Valdemir</button><button className="rs-back" onClick={toggleMode} title="Voltar ao painel completo">Desktop</button></div>
+    {mobilePanel==="analista"?<MobileAnalystPanel userName={userName} dataMode={dataMode} onDesktopPage={(target)=>{setPage(target as Page);toggleMode()}}/>:<TechnicianPortal desktop={false} onToggleMode={()=>setMobilePanel("analista")}/>}
+  </div>;
   return <div className={`app role-${role}${cloudBusy?" cloud-busy":""}`} aria-busy={cloudBusy}>
     <aside className="sidebar">
-      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 8.4</span></div></div>
+      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 8.5</span></div></div>
       <nav>{visibleMenu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>setPage(label)}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
       <div className="side-bottom"><button onClick={()=>setPage("Configurações")}><CircleHelp size={18}/>Configurações e backup</button>{can(role,"local.clear")&&<button onClick={clearLocalData}><Settings size={18}/>Limpar dados locais</button>}
         <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>void signOut()} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
