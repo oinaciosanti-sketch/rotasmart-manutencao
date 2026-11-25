@@ -28,7 +28,7 @@ export default function OperationalMap(){
   for(const t of active){const b=findBranch(t);if(!b)continue;const list=byId.get(b.id)||[];list.push(t);byId.set(b.id,list)}
   return byId;
  },[active,branches]);
- const available=useMemo(()=>branches.filter(b=>filialNumber(b.numeroFilial)&&filialNumber(b.numeroFilial)!=='58'&&isValidCoordinate(b.latitude,b.longitude)),[branches]);
+ const available=useMemo(()=>branches.filter(b=>filialNumber(b.numeroFilial)&&!['56','58'].includes(filialNumber(b.numeroFilial))&&!String(b.fonteCoordenada||'').includes('conferir endereço atual')&&isValidCoordinate(b.latitude,b.longitude)),[branches]);
  const cities=useMemo(()=>Array.from(new Set(branches.map(b=>b.cidade).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt-BR')),[branches]);
  const pins=useMemo(()=>available.filter(b=>{
   const list=groups.get(b.id)||[];
@@ -36,7 +36,7 @@ export default function OperationalMap(){
  }),[available,groups,query,city,onlyWithCalls,onlyCritical]);
  const selectedBranch=branches.find(b=>b.id===selected);
  const selectedTickets=selectedBranch?(groups.get(selectedBranch.id)||[]):[];
- const missing=branches.filter(b=>filialNumber(b.numeroFilial)&&!isValidCoordinate(b.latitude,b.longitude)||filialNumber(b.numeroFilial)==='58');
+ const missing=branches.filter(b=>filialNumber(b.numeroFilial)&&!isValidCoordinate(b.latitude,b.longitude)||['56','58'].includes(filialNumber(b.numeroFilial))||String(b.fonteCoordenada||'').includes('conferir endereço atual'));
  const pendingTickets=active.filter(t=>!findBranch(t));
  const critical=active.filter(t=>t.urgency==='Alta');
  const panel:React.CSSProperties={background:'#fff',border:'1px solid #e2e8f0',borderRadius:12,padding:14};
@@ -49,7 +49,7 @@ export default function OperationalMap(){
    <label style={{display:'flex',alignItems:'center',gap:5,fontSize:13}}><input type="checkbox" checked={onlyWithCalls} onChange={e=>setOnlyWithCalls(e.target.checked)}/> Somente com chamados</label>
    <label style={{display:'flex',alignItems:'center',gap:5,fontSize:13}}><input type="checkbox" checked={onlyCritical} onChange={e=>setOnlyCritical(e.target.checked)}/> Alta urgência</label>
   </div>
-  {missing.length>0&&<p className="import-alert">{missing.length} filial(is) sem posição aprovada. A filial 58 permanece pendente. Os pontos sem coordenadas não são inventados. {pendingTickets.length>0?`${pendingTickets.length} chamado(s) sem vínculo com filial.`:''}</p>}
+  {missing.length>0&&<p className="import-alert">{missing.length} filial(is) sem posição aprovada. As filiais 56 e 58 permanecem pendentes. Os pontos sem coordenadas não são inventados. {pendingTickets.length>0?`${pendingTickets.length} chamado(s) sem vínculo com filial.`:''}</p>}
   <div style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(265px,340px)',gap:12,alignItems:'start'}} className="strategic-map-layout">
    <div className="op-map-card"><MapContainer center={[-27.4,-50.2]} zoom={7} scrollWheelZoom style={{height:610,width:'100%',borderRadius:12}}><TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/><AutoZoom points={pins.map(b=>({latitude:Number(b.latitude),longitude:Number(b.longitude)}))}/>
     {pins.map(b=>{const list=groups.get(b.id)||[];const red=list.some(t=>t.urgency==='Alta');const color=red?'#dc2626':list.length?'#2563eb':'#64748b';return <CircleMarker key={b.id} center={[Number(b.latitude),Number(b.longitude)]} radius={selected===b.id?12:8+Math.min(list.length,6)} pathOptions={{color:'#fff',weight:selected===b.id?3:1.5,fillColor:color,fillOpacity:.9}} eventHandlers={{click:()=>setSelected(b.id)}}><Tooltip direction="top" offset={[0,-8]}>{`Filial ${filialNumber(b.numeroFilial)} · ${b.cidade} · ${list.length} chamado(s)`}</Tooltip></CircleMarker>})}

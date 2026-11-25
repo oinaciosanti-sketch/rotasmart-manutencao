@@ -1,0 +1,77 @@
+﻿Filial;Cidade;Marcação coluna K;Latitude Excel;Longitude Excel;Latitude aplicada;Longitude aplicada;Origem aplicada;Situação da carga;Observações Excel
+1;Jaraguá do Sul;;;;;;;SEM APROVAÇÃO/COORDENADA;
+2;Piên;;-26.9576;-49.4209157;;;;SEM APROVAÇÃO/COORDENADA;
+3;Jaraguá do Sul;anp/pmqc — pmqc_2020_06.csv;-26.48018115;-49.0564048;;;;SEM APROVAÇÃO/COORDENADA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+4;Jaraguá do Sul;;;;;;;SEM APROVAÇÃO/COORDENADA;Filial desativada no documento mestre
+5;Brusque;anp/pmqc — pmqc_2020_04.csv;-27.10328503;-48.91551368;;;;SEM APROVAÇÃO/COORDENADA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+6;Joinville;anp/pmqc — pmqc_2020_05.csv;-26.28042;-48.84657833;;;;SEM APROVAÇÃO/COORDENADA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+7;Jaraguá do Sul;anp/pmqc — pmqc_2020_01.csv;-26.47756444;-49.10273558;;;;SEM APROVAÇÃO/COORDENADA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+8;Apiúna;ok;-27.0332769;-49.3867455;-27.0332769;-49.3867455;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+9;Pomerode;ok;-26.7551408;-49.1730685;-26.7551408;-49.1730685;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+10;Apiúna;ok;-27.032996;-49.386608;-27.032996;-49.386608;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+11;Porto Belo;ok;-27.159274;-48.5831747;-27.159274;-48.5831747;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+12;Itajaí;anp/pmqc — pmqc_2022_02.csv;-26.921713;-48.707496;;;;SEM APROVAÇÃO/COORDENADA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+13;Schroeder;ok;-26.409196;-49.077167;-26.409196;-49.077167;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+14;Pouso Redondo;;;;;;;SEM APROVAÇÃO/COORDENADA;
+15;Bom Retiro;tambem não achei;-27.825793;-49.576691;;;;SEM APROVAÇÃO/COORDENADA;Coordenada herdada de planilha anterior sem comprovação da origem
+16;Blumenau;ok;-26.87776244;-49.13040537;-26.87776244;-49.13040537;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+17;;tambem não achei;;;;;;SEM APROVAÇÃO/COORDENADA;Filial desativada no documento mestre
+18;Jaraguá do Sul;ok;;;-26.488708160615758;-49.083935886505806;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;
+19;Joinville;ok;-26.877712;-49.130092;-26.877712;-49.130092;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+20;;ok;-26.2458646;-49.3854912;-26.2458646;-49.3854912;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+21;;ok;-26.9145333;-49.0707587;-26.9145333;-49.0707587;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+22;Jaraguá do Sul;ok;-26.51416258;-49.1199277;-26.51416258;-49.1199277;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+23;Gaspar;ok;-26.9137384;-48.9631774;-26.913576713432306;-48.96059072805362;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+24;Garuva;ok;-26.0165664;-48.747223;-26.0165664;-48.747223;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+25;Indaial;ok;-26.8693709;-49.228553;-26.8693709;-49.228553;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+26;Ibirama;planilha anterior — sem fonte;-27.055089;-49.516555;-27.054909335683114;-49.51405570260994;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+27;Jaraguá do Sul;ok;-26.57918518;-49.13961511;-26.57918518;-49.13961511;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+28;Lages;planilha anterior — sem fonte;-27.7996662;-50.3134954;-27.799001880734195;-50.31298576579751;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+29;Florianopolis;ok;-27.4729265;-48.4721136;-27.4729265;-48.4721136;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+30;;ok;-26.9959414;-48.639973;-26.9959414;-48.639973;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+31;FLORIANOPOLIS;coloquei no chat;-27.682663;-48.5138572;-27.682648363510474;-48.51270004860599;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+32;Itajaí;ok;-26.93948496;-48.70451492;-26.93948496;-48.70451492;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+33;Itajaí;ok;-26.92254686;-48.67516319;-26.92254686;-48.67516319;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+34;Balneário Camboriú;não tenho certeza;-26.98265167;-48.64341667;;;;SEM APROVAÇÃO/COORDENADA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+35;Ituporanga;ok;-27.40582833;-49.60322167;-27.40582833;-49.60322167;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Divergência de cidade: planilha Joinville; Origem ANP/PMQC antiga; conferir se localização continua correta"
+36;Joinville;ok;-26.3221097;-48.8534016;-26.3221097;-48.8534016;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+37;Joinville;ok;-26.334269;-48.847857;-26.334269;-48.847857;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+38;São José;ok;-27.604754;-48.632995;-27.604754;-48.632995;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+39;Rio do Sul;ok;-27.229522;-49.6462545;-27.229522;-49.6462545;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+40;;ok;-26.314586;-48.861609;-26.314586;-48.861609;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+41;Ituporanga;ok;-27.42395;-49.601024;-27.42395;-49.601024;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+42;Araquari;ok;-26.436113;-48.814042;-26.436113;-48.814042;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+43;Araquari;ok;-26.43580333;-48.81032333;-26.43580333;-48.81032333;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+44;Blumenau;ok;-26.88645833;-49.08245833;-26.88645833;-49.08245833;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+45;São Bento do Sul;ok;-26.223104;-49.389788;-26.223104;-49.389788;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+46;;ok;-26.246145;-48.63362;-26.246145;-48.63362;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+47;Guaramirim;ok;-26.47739103;-48.99606147;-26.47739103;-48.99606147;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+48;Lages;ok;-27.798416;-50.305396;-27.798416;-50.305396;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+49;Balneário Camboriu;ok;-27.02526;-48.60625;-27.02526;-48.60625;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+50;Jaraguá do Sul;ok;-26.489969;-49.056311;-26.489969;-49.056311;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+51;Blumenau;ok;-26.93089205;-49.05950538;-26.93089205;-49.05950538;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+52;Navegantes;ok;-26.850942;-48.709926;-26.850942;-48.709926;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+53;Florianópolis;ok;-27.595819;-48.55818;-27.595819;-48.55818;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+54;Navegantes;ok;-26.85215833;-48.71086;-26.85215833;-48.71086;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+55;Florianópolis;ok;-27.652304;-48.516767;-27.652304;-48.516767;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+56;Rio do Sul;ok;-28.680041;-49.378272;;;;PENDENTE: localização divergente;"Divergência de cidade: planilha Criciuma; Coordenada herdada de planilha anterior sem comprovação da origem"
+57;São Jose;ok;-27.6047738;-48.63273622;-27.6047738;-48.63273622;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;"Origem ANP/PMQC antiga; conferir se localização continua correta"
+58;Joinville;;;;;;;PENDENTE: localização divergente;Coordenada herdada de planilha anterior sem comprovação da origem
+59;São Jose;ok;-27.604478;-48.634049;-27.604478;-48.634049;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+60;;sem certeza;-26.795729;-49.677395;;;;SEM APROVAÇÃO/COORDENADA;Coordenada herdada de planilha anterior sem comprovação da origem
+61;;sem certeza;;;;;;SEM APROVAÇÃO/COORDENADA;
+62;RIO DO SUL;ok;-27.202296;-49.633333;-27.202296;-49.633333;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+63;JOINVILLE;ok;-26.316015;-48.840368;-26.316015;-48.840368;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+64;;sem certeza;;;;;;SEM APROVAÇÃO/COORDENADA;
+65;;;;;;;;SEM APROVAÇÃO/COORDENADA;
+66;;;;;;;;SEM APROVAÇÃO/COORDENADA;
+67;;ok;-27.650595;-48.69536;-27.650595;-48.69536;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+68;BLUMENAU;;;;-26.892175923810854;-49.08435747116473;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;
+69;BLUMENAU;ok;-26.860679;-49.101061;-26.86054976434701;-49.10103954642724;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+71;BLUMENAU;ok;-26.951353;-49.071285;-26.951137795534976;-49.07129573293008;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+72;BLUMENAU;ok;;;-26.914168581630566;-49.060769284375894;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;"Coordenada informada na planilha anterior: -266.914289 / -49.060512; Coordenada herdada de planilha anterior sem comprovação da origem"
+73;BLUMENAU;ok;-26.88387;-49.101803;-26.88387;-49.101803;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+74;BLUMENAU;ok;-26.905291;-49.075514;-26.905291;-49.075514;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+75;GASPAR;ok;-26.900431;-49.011307;-26.900431;-49.011307;Excel — OK conferido pelo usuário (coluna K);APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+76;BLUMENAU;planilha anterior — sem fonte;;;-26.91069577551468;-49.04512697562722;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
+77;BLUMENAU;planilha anterior — sem fonte;-26.884918;-49.084313;-26.88485610742434;-49.0842861332989;Coordenada enviada por texto — 24/11/2026;APROVADA PARA CARGA;Coordenada herdada de planilha anterior sem comprovação da origem
