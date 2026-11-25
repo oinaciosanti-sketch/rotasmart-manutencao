@@ -35,7 +35,7 @@ const canonicalStatus = (value: Status): Status => value === "Fechado" ? "Conclu
 const ticketSubject = (ticket: Ticket): string => ticket.sourceFields?.subject?.trim() || ticket.desc.split(" — ")[0]?.trim() || "Sem assunto";
 const ticketDescription = (ticket: Ticket): string => ticket.sourceFields?.description?.trim() || ticket.desc;
 
-type Page = "Dashboard" | "Chamados" | "Planner semanal" | "Montar rota" | "Mapa de rotas" | "Mapa de chamados" | "Estoque móvel" | "Filiais" | "Postos" | "Analistas" | "Técnicos" | "Usuários" | "Importar chamados" | "Configurações";
+type Page = "Dashboard" | "Chamados" | "Planner semanal" | "Montar rota" | "Mapa de rotas" | "Mapa Estratégico das Filiais" | "Estoque móvel" | "Filiais" | "Postos" | "Analistas" | "Técnicos" | "Usuários" | "Importar chamados" | "Configurações";
 type Ticket = AppTicket;
 type Technician = AppTechnician;
 const relativeDate=(days:number)=>{const date=new Date();date.setHours(12,0,0,0);date.setDate(date.getDate()+days);return date.toISOString().slice(0,10)};
@@ -50,7 +50,7 @@ const techs: Technician[] = [
 
 const menu: {label:Page; icon:any}[] = [
   {label:"Dashboard",icon:LayoutDashboard},{label:"Chamados",icon:TicketCheck},{label:"Planner semanal",icon:CalendarDays},
-  {label:"Montar rota",icon:Route},{label:"Mapa de rotas",icon:Map},{label:"Mapa de chamados",icon:MapPin},{label:"Estoque móvel",icon:Wrench},{label:"Postos",icon:Building2},{label:"Filiais",icon:MapPin},
+  {label:"Montar rota",icon:Route},{label:"Mapa de rotas",icon:Map},{label:"Mapa Estratégico das Filiais",icon:MapPin},{label:"Estoque móvel",icon:Wrench},{label:"Postos",icon:Building2},{label:"Filiais",icon:MapPin},
   {label:"Analistas",icon:UserRound},{label:"Técnicos",icon:Users},{label:"Usuários",icon:ShieldCheck},{label:"Importar chamados",icon:UploadCloud},
 ];
 
@@ -78,7 +78,7 @@ function AppShell() {
   </div>;
   return <div className={`app role-${role}${cloudBusy?" cloud-busy":""}`} aria-busy={cloudBusy}>
     <aside className="sidebar">
-      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 8.6</span></div></div>
+      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 8.7</span></div></div>
       <nav>{visibleMenu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>setPage(label)}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
       <div className="side-bottom"><button onClick={()=>setPage("Configurações")}><CircleHelp size={18}/>Configurações e backup</button>{can(role,"local.clear")&&<button onClick={clearLocalData}><Settings size={18}/>Limpar dados locais</button>}
         <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>void signOut()} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
@@ -94,7 +94,7 @@ function AppShell() {
         {page==="Planner semanal"&&<Planner items={appTickets} setItems={setAppTickets} go={setPage} flash={flash}/>}
         {page==="Montar rota"&&<RouteErrorBoundary><RouteBuilder flash={flash} items={appTickets} setItems={setAppTickets}/></RouteErrorBoundary>}
         {page==="Mapa de rotas"&&<RouteErrorBoundary><TomTomRouteMap flash={flash} items={appTickets}/></RouteErrorBoundary>}
-        {page==="Mapa de chamados"&&<RouteErrorBoundary><OperationalMap/></RouteErrorBoundary>}
+        {page==="Mapa Estratégico das Filiais"&&<RouteErrorBoundary><OperationalMap/></RouteErrorBoundary>}
         {page==="Estoque móvel"&&<VehicleInventory/>}
         {page==="Filiais"&&<Branches flash={flash}/>}
         {page==="Postos"&&<PostosBoard/>}
