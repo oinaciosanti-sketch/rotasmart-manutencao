@@ -23,6 +23,7 @@ export type Filial = {
   observacoes: string;
 };
 
+// ROTASMART_V86_COORDENADAS: 11 coordenadas informadas em 24/11/2026. Filial 58 pendente.
 // Base inicial vazia para a versão demonstrativa.
 // Novas filiais poderão ser cadastradas pelo sistema.
 const rawInitialBranches: Filial[] = [
@@ -414,12 +415,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "(047) 3370-3007",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -26.488708160615758,
+    "longitude": -49.083935886505806,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-26.488708160615758,-49.083935886505806",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -524,12 +525,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "(47) 3308-0636",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -26.913576713432306,
+    "longitude": -48.96059072805362,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-26.913576713432306,-48.96059072805362",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -590,12 +591,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "(47) 3357-2274",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -27.054909335683114,
+    "longitude": -49.51405570260994,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-27.054909335683114,-49.51405570260994",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -634,12 +635,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "(049) 3229-2150",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -27.799001880734195,
+    "longitude": -50.31298576579751,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-27.799001880734195,-50.31298576579751",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -700,12 +701,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -27.682648363510474,
+    "longitude": -48.51270004860599,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-27.682648363510474,-48.51270004860599",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -1514,12 +1515,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -26.892175923810854,
+    "longitude": -49.08435747116473,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-26.892175923810854,-49.08435747116473",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -1536,12 +1537,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -26.86054976434701,
+    "longitude": -49.10103954642724,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-26.86054976434701,-49.10103954642724",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -1558,12 +1559,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -26.951137795534976,
+    "longitude": -49.07129573293008,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-26.951137795534976,-49.07129573293008",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -1580,12 +1581,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -26.914168581630566,
+    "longitude": -49.060769284375894,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-26.914168581630566,-49.060769284375894",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -1668,12 +1669,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -26.91069577551468,
+    "longitude": -49.04512697562722,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-26.91069577551468,-49.04512697562722",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   },
   {
@@ -1690,12 +1691,12 @@ const rawInitialBranches: Filial[] = [
     "telefone": "",
     "gerenteTelefone": "",
     "status": "ativo",
-    "latitude": null,
-    "longitude": null,
-    "geocodeStatus": "pendente",
+    "latitude": -26.88485610742434,
+    "longitude": -49.0842861332989,
+    "geocodeStatus": "preenchida",
     "statusDados": "sem_coordenadas",
-    "fonteCoordenada": "",
-    "linkMapa": "",
+    "fonteCoordenada": "Informada pelo usuário em 24/11/2026 — validar ponto",
+    "linkMapa": "https://www.google.com/maps?q=-26.88485610742434,-49.0842861332989",
     "observacoes": "Dados do documento; confirmar antes de usar no mapa"
   }
 ];
