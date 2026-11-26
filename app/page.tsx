@@ -24,6 +24,7 @@ import UsersPage from "./components/UsersPage";
 import TechnicianPortal from "./components/TechnicianPortal";
 import MobileAnalystPanel from "./components/MobileAnalystPanel";
 import TechnicalReport from "./components/TechnicalReport";
+import { OnlinePilot } from "./components/OnlinePilot";
 import { AccessStatusScreen, AuthLoading, LoginScreen, useAuth } from "./components/AuthProvider";
 import {can,type AppRole} from "./lib/permissions";
 const VehicleInventory=dynamic(()=>import("./components/VehicleInventory"),{ssr:false,loading:()=><div>Carregando estoque...</div>});
@@ -56,7 +57,8 @@ const menu: {label:Page; icon:any}[] = [
   {label:"Analistas",icon:UserRound},{label:"Técnicos",icon:Users},{label:"Usuários",icon:ShieldCheck},{label:"Importar chamados",icon:UploadCloud},
 ];
 
-export default function App(){const auth=useAuth();if(auth.loading)return <AuthLoading/>;if(auth.configured&&!auth.user)return <LoginScreen/>;if(auth.configured&&auth.profile&&(!auth.profile.ativo||(auth.profile.status&&auth.profile.status!=="ativo")))return <AccessStatusScreen/>;return <AppDataProvider initialTickets={tickets} initialTechnicians={techs} initialBranches={filiaisBase} cloudEnabled={auth.dataMode==="cloud"} cloudWritable={["admin","analista"].includes(auth.profile?.role||"")} role={auth.profile?.role||"admin"}><AppShell/></AppDataProvider>}
+export default function App(){return <OnlinePilot/>;}
+
 function AppShell() {
   const cloudBusy=useCloudBusy();
   const [page,setPage]=useState<Page>("Dashboard");

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import type { User } from "@supabase/supabase-js";
 import { AlertTriangle, Check, KeyRound, Loader2, LogIn, Route, UserPlus } from "lucide-react";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "../lib/supabase/client";
@@ -38,59 +38,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
+  const generation = useRef(0);
   const loadProfile = async (currentUser: User | null) => {
-    if (!currentUser) {
-      setProfile(null);
-      return;
-    }
+    const request = ++generation.current;
+    setProfile(null);
+    if (!currentUser) return;
     const client = getSupabaseBrowserClient();
     if (!client) return;
-    // Avoid nested PostgREST relationships here: a stale schema cache must never turn
-    // a real admin into the visual "pending" fallback.
-    const claimed: any = await client.rpc("claim_my_pending_profile");
-    let result: any = await client.from("profiles").select("*").eq("user_id", currentUser.id).maybeSingle();
-    if(result.error?.code==="42703")result=await client.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
-    if(!result.data&&claimed.data)result={data:claimed.data,error:null};
-    if(!result.data)result=await client.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
-    const data=result.data as any;
-    let analystName:string|null=null,technicianName:string|null=null;
-    if(data?.analyst_id){const analyst=await client.from("analysts").select("name").eq("id",data.analyst_id).maybeSingle();analystName=analyst.data?.name||null}
-    if(data?.technician_id){const technician=await client.from("technicians").select("name").eq("id",data.technician_id).maybeSingle();technicianName=technician.data?.name||null}
-    setProfile(
-      data ? {...data,analystName,technicianName} : {
-        id: currentUser.id,
-        nome: String(currentUser.user_metadata?.nome || currentUser.email?.split("@")[0] || "Usuário"),
-        email: currentUser.email || "",
-        role: "visualizador",
-        analyst_id: null,
-        ativo: false,status:"pendente",
-      } as UserProfile,
-    );
+    const result = await client.from("profiles").select("*").eq("user_id", currentUser.id).maybeSingle();
+    if (request !== generation.current) return;
+    if (!result.error && result.data) setProfile(result.data as UserProfile);
   };
-
   useEffect(() => {
     setHydrated(true);
-    if (!configured) {
-      setLoading(false);
-      return;
-    }
+    if (!configured) { setLoading(false); return; }
     const client = getSupabaseBrowserClient()!;
-    client.auth.getUser().then(async ({ data }) => {
-      setUser(data.user);
-      await loadProfile(data.user);
-      setLoading(false);
-    });
+    let active = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const { data } = client.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-      void loadProfile(session?.user || null);
-      setLoading(false);
+      if (!active) return;
+      const current = session?.user || null;
+      generation.current++;
+      setLoading(true); setUser(current); setProfile(null);
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (!active) return;
+        void loadProfile(current).catch(() => { /* fail closed */ }).finally(() => { if (active) setLoading(false); });
+      }, 0);
     });
-    return () => data.subscription.unsubscribe();
+    return () => { active = false; generation.current++; if (timer) clearTimeout(timer); data.subscription.unsubscribe(); };
   }, [configured]);
 
   const signOut = async () => {
     const client = getSupabaseBrowserClient();
     if (client) await client.auth.signOut();
+    generation.current++;
     setUser(null);
     setProfile(null);
   };
