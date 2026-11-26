@@ -61,15 +61,16 @@ function xlsxRows(sheet:string,strings:string[],dateStyles:Set<number>){
   return rows;
 }
 async function readXlsx(bytes:Uint8Array){
-  const dir=unzipDirectory(bytes),sheet=await unzipEntry(bytes,'xl/worksheets/sheet1.xml',dir);
-  if(!sheet)throw Error('A planilha não contém a primeira aba. Exporte em CSV.');
-  const sst=await unzipEntry(bytes,'xl/sharedStrings.xml',dir);const strings=sst?[...sst.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(m=>matchText(m[1])):[];
-  const stylesXml=await unzipEntry(bytes,'xl/styles.xml',dir)||'';const formats=new Set<number>();
+  const dir=unzipDirectory(bytes);
+  const sheets=[...dir.entries.keys()].filter(n=>/^xl\/worksheets\/sheet\d+\.xml$/.test(n));
+  if(!sheets.length)throw Error('O Excel não contém abas de dados.');
+  const sst=await unzipEntry(bytes,'xl/sharedStrings.xml',dir);const strings=sst?[...sst.replace(/<(\/?)x:/g,'<$1').matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(m=>matchText(m[1])):[];
+  const stylesXml=(await unzipEntry(bytes,'xl/styles.xml',dir)||'').replace(/<(\/?)x:/g,'<$1');const formats=new Set<number>();
   for(const m of stylesXml.matchAll(/<numFmt\b([^>]*)\/>/g)){const id=Number((m[1].match(/numFmtId="(\d+)"/)||[])[1]);const code=(m[1].match(/formatCode="([^"]+)"/)||[])[1]||'';if(/[dmy]/i.test(code))formats.add(id)}
   for(const id of [14,15,16,17,18,19,20,21,22])formats.add(id);
   const dateStyles=new Set<number>(),cellStyles=(stylesXml.match(/<cellXfs\b[^>]*>([\s\S]*?)<\/cellXfs>/)||[])[1]||'';
   let ix=0;for(const m of cellStyles.matchAll(/<xf\b([^>]*?)(?:\/|>)\s*/g)){if(formats.has(Number((m[1].match(/numFmtId="(\d+)"/)||[])[1]||0)))dateStyles.add(ix);ix++;}
-  return xlsxRows(sheet,strings,dateStyles);
+  const all:string[][]=[];for(const name of sheets){const sheet=await unzipEntry(bytes,name,dir);if(sheet)all.push(["__ROTASMART_SHEET_BOUNDARY__"],...xlsxRows(sheet,strings,dateStyles));}return all;
 }
 function bridgeRows(text:string):MovideskRecord[]{
  const payload=JSON.parse(text);if(!payload||payload.source!=='movidesk-kanban-extension'||!Array.isArray(payload.tickets))throw Error('O JSON não é uma exportação válida do RotaSmart Bridge.');
@@ -81,7 +82,16 @@ export async function readMovideskFile(file:File):Promise<MovideskRecord[]>{
   if(file.size>10*1024*1024)throw Error('Arquivo acima de 10 MB.');
   if(file.name.toLowerCase().endsWith('.json'))return bridgeRows(await file.text());
   const rows=file.name.toLowerCase().endsWith('.xlsx')?await readXlsx(new Uint8Array(await file.arrayBuffer())):file.name.toLowerCase().endsWith('.csv')?csvRows(decodeCsv(new Uint8Array(await file.arrayBuffer()))):(()=>{throw Error('Formato inválido: use CSV ou XLSX.');})();
-  if(rows.length<2)throw Error('Arquivo vazio ou sem dados.');
-  const headers=rows[0].map(fieldKey);if(!headers.includes('numero')||!headers.includes('status'))throw Error('Não localizei as colunas obrigatórias Número e Status.');
-  return rows.slice(1).map(row=>Object.fromEntries(headers.map((h,i)=>[h,['abertoem','datadaultimaacao','dataprogramadadamanutencao'].includes(h)&&/^\d{5}(?:\.\d+)?$/.test(String(row[i]??''))?excelDate(String(row[i])):String(row[i]??'').trim()]))).filter(r=>r.numero);
+  return recordsFromRows(rows);
+}
+const aliases:Record<string,string>={numerodoticket:'numero',numerodochamado:'numero',numeroticket:'numero',numerochamado:'numero',ticketnumero:'numero',ticketstatus:'status',situacao:'status',titulo:'assunto',ticketassunto:'assunto',descricao:'descricaodoticket',dataabertura:'abertoem',datadeabertura:'abertoem',ticketresponsavel:'responsavel',filial:'filialpostoponto',empresafilial:'filialpostoponto',servico:'servicocompleto'};
+const headerKey=(v:unknown)=>{const k=fieldKey(v);return aliases[k]||k;};
+export function recordsFromRows(rows:string[][]):MovideskRecord[]{
+ let headers:string[]=[];const records:MovideskRecord[]=[];let found=false;
+ for(const row of rows){if(row[0]==="__ROTASMART_SHEET_BOUNDARY__"){headers=[];continue;}const keys=Array.from(row,headerKey);if(keys.includes('numero')&&keys.includes('status')){headers=keys;found=true;continue;}if(!headers.length)continue;
+ const r:MovideskRecord={};headers.forEach((h,i)=>{if(!h||['__proto__','constructor','prototype'].includes(h))return;let v=String(row[i]??'').trim();if(v&&['abertoem','datadaultimaacao','dataprogramadadamanutencao','dataprogramada','resolvidoem','fechadoem','reabertoem','vencimentoem'].includes(h)&&/^\d{5}(?:\.\d+)?$/.test(v))v=excelDate(v);if(v)r[h]=v;});
+ if(r.numero)records.push(r);
+ }
+ if(!found)throw Error('Cabeçalhos Número e Status não encontrados. O arquivo pode estar vazio ou incompleto. Sua carteira não foi alterada.');
+ if(!records.length)throw Error('Cabeçalhos reconhecidos, mas nenhum chamado encontrado. Sua carteira não foi alterada.');return records;
 }
