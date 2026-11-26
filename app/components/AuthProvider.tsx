@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   const generation = useRef(0);
+  const sessionIdentity = useRef<string | null | undefined>(undefined);
   const loadProfile = async (currentUser: User | null) => {
     const request = ++generation.current;
     setProfile(null);
@@ -58,6 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data } = client.auth.onAuthStateChange((_event, session) => {
       if (!active) return;
       const current = session?.user || null;
+      if (current && sessionIdentity.current === current.id && (_event === "TOKEN_REFRESHED" || _event === "SIGNED_IN")) { setUser(current); return; }
+      sessionIdentity.current = current?.id ?? null;
       generation.current++;
       setLoading(true); setUser(current); setProfile(null);
       if (timer) clearTimeout(timer);
