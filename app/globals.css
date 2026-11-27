@@ -55,3 +55,9 @@
 
 /* V8.13 Planner */
 .plan-card.plan-overdue{background:#fffbeb;border-color:#f5d28a;color:#78350f}.plan-card.plan-complete{background:#f0fdf4;border-color:#bbf7d0;color:#14532d}.plan-card.plan-overdue:hover{background:#fef3c7}.plan-card.plan-complete:hover{background:#dcfce7}
+
+/* Beta 2.1: navigation without compressed sidebar */
+.rs-nav-overlay{display:none}.rs-menu-button{border:0;background:none;color:#334155;cursor:pointer;padding:8px}
+@media(max-width:760px){
+ .app{display:block;min-width:0;width:100%}.app>main{margin-left:0;width:100%;min-width:0}.app .sidebar{display:none;width:min(280px,86vw);z-index:120;overflow:auto}.app .sidebar.rs-nav-open{display:flex}.app .sidebar nav span,.app .sidebar nav em,.app .sidebar .side-bottom,.app .sidebar .brand{overflow:visible}.app .sidebar nav button{justify-content:flex-start}.app .sidebar nav span{display:inline}.rs-nav-overlay{display:block;position:fixed;inset:0;background:#0f172a77;border:0;z-index:119}.app header{position:static;padding:0 10px;gap:8px}.app .mobile-menu{display:flex;flex:none}.app .global-search{min-width:0;flex:1}.app .global-search input{width:100%;min-width:0}.app .global-search kbd{display:none}.app .header-actions{gap:2px}.app .header-actions>button:not(:first-child){display:none}.app .content{padding:14px 10px 40px;min-width:0}.app .kanban{max-width:100%;width:100%;overflow-x:auto}.app .kanban-filters .searchbox{min-width:0}.app .toolbar>*{max-width:100%}.app .table-panel{overflow-x:auto}.rs-sync-bar{position:relative!important;gap:5px!important;padding:7px!important}.rs-sync-bar>strong,.rs-sync-bar>span{width:100%}.rs-sync-bar .btn{font-size:11px;padding:7px 9px;height:auto;min-height:34px}.app .tech-modal,.app .branch-modal{max-width:calc(100vw - 20px)}
+}
