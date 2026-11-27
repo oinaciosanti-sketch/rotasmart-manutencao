@@ -1,0 +1,1 @@
+Beta 4.2 — Painel em duas colunas, acompanhamento filtrado, cartões encerrados recolhidos, confirmação de chamados no banco após envio. Sem alteração SQL. Requer Beta 4.1 instalada. Testar com dados fictícios.
