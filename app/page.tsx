@@ -33,6 +33,8 @@ const VehicleInventory=dynamic(()=>import("./components/VehicleInventory"),{ssr:
 const OperationalMap=dynamic(()=>import("./components/OperationalMap"),{ssr:false,loading:()=><div className="map-loading">Carregando mapa operacional…</div>});
 const LeafletRouteMap=dynamic(()=>import("./components/LeafletRouteMap"),{ssr:false,loading:()=><div className="map-loading">Carregando mapa OpenStreetMap…</div>});
 
+const LiveRouteMap=dynamic(()=>import("./components/LiveRouteMap"),{ssr:false,loading:()=><div>Carregando RotaSmart Live…</div>});
+
 type Status = TicketStatus;
 // O Movidesk pode registrar Fechado; na operação RotaSmart equivale a Concluído.
 // Mantemos o valor bruto importado em sourceStatus para auditoria.
@@ -78,7 +80,7 @@ function AppShell() {
   const role:AppRole=profile?.role||(configured?"visualizador":"admin");const visibleMenu=menu.filter(item=>item.label!=="Usuários").filter(item=>item.label!=="Importar chamados"||can(role,"imports.run")).filter(item=>item.label!=="Montar rota"||can(role,"routes.create"));
   const modeKey=`rotasmart-view-mode-${user?.id||"local"}`;
   const [mobileMode,setMobileMode]=useState(()=>role==="tecnico"||(typeof window!=="undefined"&&(localStorage.getItem(modeKey)==="mobile"||(localStorage.getItem(modeKey)!=="desktop"&&window.innerWidth<720))));
-  const [mobilePanel,setMobilePanel]=useState<"analista"|"tecnico">("analista");
+  const [mobilePanel,setMobilePanel]=useState<"analista"|"tecnico"|"live">("analista");
   const toggleMode=()=>setMobileMode(current=>{const next=!current;localStorage.setItem(modeKey,next?"mobile":"desktop");return next});
   const userName=profile?.nome||user?.email?.split("@")[0]||"Inácio Carvalho";const userInitials=userName.split(/\s+/).slice(0,2).map(part=>part[0]).join("").toUpperCase();
   const [toast,setToast]=useState("");
@@ -88,12 +90,12 @@ function AppShell() {
   if(role==="tecnico")return <TechnicianPortal desktop={false} onToggleMode={toggleMode}/>;
   if(mobileMode)return <div className="rs-v85-mobile-shell">
     <style>{` .rs-v85-mobile-shell{min-height:100vh;background:#f3f6fb;color:#183453;font-family:inherit} .rs-v85-switch{position:sticky;top:0;z-index:110;background:#fff;border-bottom:1px solid #dbe5f1;display:flex;align-items:center;gap:7px;padding:10px 12px;box-shadow:0 2px 8px rgba(15,32,60,.08)} .rs-v85-switch button{border:1px solid #cfdae9;border-radius:9px;background:#fff;color:#294563;font-weight:700;font-size:12px;padding:10px;cursor:pointer} .rs-v85-switch button.rs-selected{background:#265fad;color:#fff;border-color:#265fad} .rs-v85-switch .rs-back{margin-left:auto} .rs-v85-switch .rs-v85-mode-label{font-size:11px;color:#687e96;white-space:nowrap} `}</style>
-    <div className="rs-v85-switch"><button className={mobilePanel==="analista"?"rs-selected":""} onClick={()=>setMobilePanel("analista")}>Meu Mobile</button><button className="rs-back" onClick={toggleMode} title="Voltar ao painel completo">Desktop</button></div>
-    {mobilePanel==="analista"?<MobileAnalystPanel userName={userName} dataMode={dataMode} onDesktopPage={(target)=>{setPage(target==="Mapa de chamados"?"Mapa de rotas":target as Page);toggleMode()}}/>:<TechnicianPortal desktop={false} onToggleMode={()=>setMobilePanel("analista")}/>}
+    <div className="rs-v85-switch"><button className={mobilePanel==="analista"?"rs-selected":""} onClick={()=>setMobilePanel("analista")}>Meu Mobile</button><button className={mobilePanel==="live"?"rs-selected":""} onClick={()=>setMobilePanel("live")}>Mapa Live</button><button className="rs-back" onClick={toggleMode} title="Voltar ao painel completo">Desktop</button></div>
+    {mobilePanel==="live"?<div style={{padding:12}}><RouteErrorBoundary><LiveRouteMap/></RouteErrorBoundary></div>:mobilePanel==="analista"?<MobileAnalystPanel userName={userName} dataMode={dataMode} onDesktopPage={(target)=>{setPage(target==="Mapa de chamados"?"Mapa de rotas":target as Page);toggleMode()}}/>:<TechnicianPortal desktop={false} onToggleMode={()=>setMobilePanel("analista")}/>}
   </div>;
   return <div className={`app role-${role}${cloudBusy?" cloud-busy":""}`} aria-busy={cloudBusy}>
     <aside className={`sidebar ${navOpen?"rs-nav-open":""}`}>
-      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 3.4</span></div></div>
+      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 4</span></div></div>
       <nav>{visibleMenu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>{setPage(label);setNavOpen(false)}}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
       <div className="side-bottom"><button onClick={()=>{setPage("Configurações");setNavOpen(false)}}><CircleHelp size={18}/>Configurações e backup</button>
         <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>{if(window.confirm("Sair? Publique ou exporte alterações pendentes antes de sair."))void signOut()}} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
@@ -103,7 +105,7 @@ function AppShell() {
     <main>
       <header><button className="mobile-menu rs-menu-button" aria-label="Abrir menu" aria-expanded={navOpen} onClick={()=>setNavOpen(v=>!v)}><Menu/></button><div className="global-search"><Search size={18}/><input value={search} onChange={e=>openGlobalSearch(e.target.value)} placeholder="Buscar chamado, filial ou técnico..."/><kbd>⌘ K</kbd></div><div className="header-actions"><button onClick={toggleMode} title="Modo mobile"><Smartphone size={19}/></button><span className={`data-mode-pill ${dataMode}`}>{dataMode==="cloud"?"Nuvem":"Local"}</span><button><CircleHelp size={19}/></button><button className="notif"><Bell size={19}/><i/></button><div className="avatar small">{userInitials}</div></div></header>
       <section className={`content page-${page.toLowerCase().replace(/[^a-z0-9]/g,"")}`}>
-        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 3.4 — Carteira compartilhada":"Modo local"}</b><span>{"Use a barra superior para publicar ou receber alterações. Estoque móvel permanece local."}</span></div>
+        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 4 — Carteira compartilhada":"Modo local"}</b><span>{"Use a barra superior para publicar ou receber alterações. Estoque móvel permanece local."}</span></div>
         {fieldEvents.error&&<div className="routing-warning" role="alert">Execução em campo: consulta falhou; informações podem estar desatualizadas. {fieldEvents.error}</div>}{lastImport&&<div style={{fontSize:12,color:"#475569",margin:"8px 0"}}>Última importação Movidesk registrada: {new Date(lastImport).toLocaleString("pt-BR")} · atualização por arquivo, não em tempo real</div>}
         {persistenceError&&<div className="persistence-banner"><AlertTriangle size={18}/><div><b>Atenção à persistência local</b><span>{persistenceError}</span></div></div>}
         {page==="Dashboard"&&<Dashboard go={setPage}/>}
@@ -301,6 +303,7 @@ function TomTomRouteMap({flash,items}:{flash:(s:string)=>void;items:Ticket[]}){
  const initialMapTechnician=activeTechs.find(technician=>items.some(ticket=>ticket.active!==false&&!ticket.deletedAt&&ticket.date===initialMapDay&&ticket.tech===technician.name&&ticket.routeId&&ticket.planningStatus!=="nao_planejado"&&ticket.status!=="Cancelado"));
  const [selected,setSelected]=useState<string|null>(initialMapTechnician?.name||activeTechs[0]?.name||null);
  const [day,setDay]=useState(initialMapDay);
+ const [liveView,setLiveView]=useState(true);
  const [editing,setEditing]=useState<Ticket|null>(null);
  const [analyst,setAnalyst]=useState("");
  const [city,setCity]=useState("");
@@ -329,6 +332,8 @@ function TomTomRouteMap({flash,items}:{flash:(s:string)=>void;items:Ticket[]}){
  const changeMapDay=(nextDay:string)=>{setDay(nextDay);const technicianWithRoute=activeTechs.find(technician=>items.some(ticket=>ticket.active!==false&&!ticket.deletedAt&&ticket.date===nextDay&&ticket.tech===technician.name&&ticket.routeId&&ticket.planningStatus!=="nao_planejado"&&ticket.status!=="Cancelado"));setSelected(technicianWithRoute?.name||activeTechs[0]?.name||null)};
  const clearFilters=()=>{setAnalyst("");setCity("");setUrgency("")};
  return <>
+  <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}><button className={`btn ${liveView?"primary":"secondary"}`} onClick={()=>setLiveView(true)}>RotaSmart Live</button><button className={`btn ${!liveView?"primary":"secondary"}`} onClick={()=>setLiveView(false)}>Rotas planejadas</button></div>
+  {liveView?<LiveRouteMap/>:<>
   <PageHead title="Mapa de rotas" sub="Rotas confirmadas e rascunhos, ordenados pela sequência planejada.">
    <input className="select" type="date" value={day} onChange={event=>changeMapDay(event.target.value)}/>
    <button className="btn primary" onClick={()=>{setSelected(null);flash("Exibindo todas as rotas do dia")}}><Route size={17}/>Ver todas as rotas</button>
@@ -339,6 +344,7 @@ function TomTomRouteMap({flash,items}:{flash:(s:string)=>void;items:Ticket[]}){
    <LeafletRouteMap routes={routes}/>
   </div>
   {editing&&<TicketModal ticket={editing} onChange={setEditing} onCancel={()=>setEditing(null)} onSave={()=>{updateTicket(editing);setEditing(null);flash("Chamado atualizado no mapa e nas demais telas")}} onCancelTicket={()=>{if(window.confirm("Cancelar este chamado e removê-lo do planejamento?")){cancelTicket(editing.id);setEditing(null);flash("Chamado cancelado")}}} onDelete={()=>{if(window.confirm("Tem certeza que deseja excluir este chamado? Essa ação não pode ser desfeita.")){deleteTicket(editing.id);setEditing(null);flash("Chamado excluído")}}} onOfficialComplete={()=>{updateTicket({...editing,status:"Concluído"});setEditing(null);flash("Chamado concluído oficialmente")}}/>}
+ </>}
  </>;
 }
 
