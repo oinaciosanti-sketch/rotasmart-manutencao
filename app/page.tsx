@@ -24,6 +24,7 @@ import UsersPage from "./components/UsersPage";
 import TechnicianPortal from "./components/TechnicianPortal";
 import MobileAnalystPanel from "./components/MobileAnalystPanel";
 import TechnicalReport from "./components/TechnicalReport";
+import { FieldAdmin, FieldTechnician } from "./components/FieldPilot";
 import { OnlinePilot } from "./components/OnlinePilot";
 import { SharedWorkspace, SharedWorkspaceBar } from "./components/SharedWorkspace";
 import { AccessStatusScreen, AuthLoading, LoginScreen, useAuth } from "./components/AuthProvider";
@@ -39,7 +40,7 @@ const canonicalStatus = (value: Status): Status => value === "Fechado" ? "Conclu
 const ticketSubject = (ticket: Ticket): string => ticket.sourceFields?.subject?.trim() || ticket.desc.split(" — ")[0]?.trim() || "Sem assunto";
 const ticketDescription = (ticket: Ticket): string => ticket.sourceFields?.description?.trim() || ticket.desc;
 
-type Page = "Dashboard" | "Chamados" | "Planner semanal" | "Montar rota" | "Mapa de rotas" | "Mapa Estratégico das Filiais" | "Estoque móvel" | "Filiais" | "Postos" | "Analistas" | "Técnicos" | "Usuários" | "Importar chamados" | "Configurações";
+type Page = "Execução em campo" | "Dashboard" | "Chamados" | "Planner semanal" | "Montar rota" | "Mapa de rotas" | "Mapa Estratégico das Filiais" | "Estoque móvel" | "Filiais" | "Postos" | "Analistas" | "Técnicos" | "Usuários" | "Importar chamados" | "Configurações";
 type Ticket = AppTicket;
 type Technician = AppTechnician;
 const relativeDate=(days:number)=>{const date=new Date();date.setHours(12,0,0,0);date.setDate(date.getDate()+days);return date.toISOString().slice(0,10)};
@@ -53,7 +54,7 @@ const techs: Technician[] = [
 ];
 
 const menu: {label:Page; icon:any}[] = [
-  {label:"Dashboard",icon:LayoutDashboard},{label:"Chamados",icon:TicketCheck},{label:"Planner semanal",icon:CalendarDays},
+  {label:"Dashboard",icon:LayoutDashboard},{label:"Execução em campo",icon:Wrench},{label:"Chamados",icon:TicketCheck},{label:"Planner semanal",icon:CalendarDays},
   {label:"Montar rota",icon:Route},{label:"Mapa de rotas",icon:Map},{label:"Mapa Estratégico das Filiais",icon:MapPin},{label:"Estoque móvel",icon:Wrench},{label:"Postos",icon:Building2},{label:"Filiais",icon:MapPin},
   {label:"Analistas",icon:UserRound},{label:"Técnicos",icon:Users},{label:"Usuários",icon:ShieldCheck},{label:"Importar chamados",icon:UploadCloud},
 ];
@@ -61,6 +62,7 @@ const menu: {label:Page; icon:any}[] = [
 export default function App(){
  const auth=useAuth();
  const authorized=auth.configured&&!auth.loading&&!!auth.user&&auth.profile?.user_id===auth.user.id&&auth.profile.role==="admin"&&auth.profile.ativo===true&&auth.profile.status==="ativo";
+ if(auth.configured&&!auth.loading&&auth.user&&auth.profile?.user_id===auth.user.id&&auth.profile.role==="tecnico"&&auth.profile.ativo===true&&auth.profile.status==="ativo")return <FieldTechnician key={auth.user.id}/>;
  if(!authorized)return <OnlinePilot/>;
  return <SharedWorkspace key={auth.user!.id} render={(backup,revision)=><AppDataProvider key={revision} initialTickets={[]} initialTechnicians={[]} initialBranches={[]} initialSharedBackup={backup} sharedPilot><SharedWorkspaceBar/><AppShell/></AppDataProvider>}/>;
 }
@@ -90,7 +92,7 @@ function AppShell() {
   </div>;
   return <div className={`app role-${role}${cloudBusy?" cloud-busy":""}`} aria-busy={cloudBusy}>
     <aside className={`sidebar ${navOpen?"rs-nav-open":""}`}>
-      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 2.1</span></div></div>
+      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 3</span></div></div>
       <nav>{visibleMenu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>{setPage(label);setNavOpen(false)}}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
       <div className="side-bottom"><button onClick={()=>{setPage("Configurações");setNavOpen(false)}}><CircleHelp size={18}/>Configurações e backup</button>
         <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>{if(window.confirm("Sair? Publique ou exporte alterações pendentes antes de sair."))void signOut()}} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
@@ -100,10 +102,11 @@ function AppShell() {
     <main>
       <header><button className="mobile-menu rs-menu-button" aria-label="Abrir menu" aria-expanded={navOpen} onClick={()=>setNavOpen(v=>!v)}><Menu/></button><div className="global-search"><Search size={18}/><input value={search} onChange={e=>openGlobalSearch(e.target.value)} placeholder="Buscar chamado, filial ou técnico..."/><kbd>⌘ K</kbd></div><div className="header-actions"><button onClick={toggleMode} title="Modo mobile"><Smartphone size={19}/></button><span className={`data-mode-pill ${dataMode}`}>{dataMode==="cloud"?"Nuvem":"Local"}</span><button><CircleHelp size={19}/></button><button className="notif"><Bell size={19}/><i/></button><div className="avatar small">{userInitials}</div></div></header>
       <section className={`content page-${page.toLowerCase().replace(/[^a-z0-9]/g,"")}`}>
-        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 2.1 — Carteira compartilhada":"Modo local"}</b><span>{"Use a barra superior para publicar ou receber alterações. Estoque móvel permanece local."}</span></div>
+        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 3 — Carteira compartilhada":"Modo local"}</b><span>{"Use a barra superior para publicar ou receber alterações. Estoque móvel permanece local."}</span></div>
         {lastImport&&<div style={{fontSize:12,color:"#475569",margin:"8px 0"}}>Última importação Movidesk registrada: {new Date(lastImport).toLocaleString("pt-BR")} · atualização por arquivo, não em tempo real</div>}
         {persistenceError&&<div className="persistence-banner"><AlertTriangle size={18}/><div><b>Atenção à persistência local</b><span>{persistenceError}</span></div></div>}
         {page==="Dashboard"&&<Dashboard go={setPage}/>}
+        {page==="Execução em campo"&&<FieldAdmin/>}
         {page==="Chamados"&&<Kanban items={appTickets} setItems={setAppTickets} initialSearch={search} flash={flash}/>}
         {page==="Planner semanal"&&<Planner items={appTickets} setItems={setAppTickets} go={setPage} flash={flash}/>}
         {page==="Montar rota"&&<RouteErrorBoundary><RouteBuilder flash={flash} items={appTickets} setItems={setAppTickets}/></RouteErrorBoundary>}
