@@ -29,6 +29,7 @@ import { OnlinePilot } from "./components/OnlinePilot";
 import { SharedWorkspace, SharedWorkspaceBar, usePublishedRevision } from "./components/SharedWorkspace";
 import { AccessStatusScreen, AuthLoading, LoginScreen, useAuth } from "./components/AuthProvider";
 import {can,type AppRole} from "./lib/permissions";
+const CloudVehicleInventory=dynamic(()=>import("./components/CloudVehicleInventory"),{ssr:false,loading:()=><div>Carregando estoque online...</div>});
 const VehicleInventory=dynamic(()=>import("./components/VehicleInventory"),{ssr:false,loading:()=><div>Carregando estoque...</div>});
 const OperationalMap=dynamic(()=>import("./components/OperationalMap"),{ssr:false,loading:()=><div className="map-loading">Carregando mapa operacional…</div>});
 const LeafletRouteMap=dynamic(()=>import("./components/LeafletRouteMap"),{ssr:false,loading:()=><div className="map-loading">Carregando mapa OpenStreetMap…</div>});
@@ -95,7 +96,7 @@ function AppShell() {
   </div>;
   return <div className={`app role-${role}${cloudBusy?" cloud-busy":""}`} aria-busy={cloudBusy}>
     <aside className={`sidebar ${navOpen?"rs-nav-open":""}`}>
-      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 4.7.2</span></div></div>
+      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 4.8</span></div></div>
       <nav className="rs-grouped-nav">{["Operação","Inteligência","Administração"].map(group=><div className="rs-nav-group" key={group}><div className="rs-nav-heading">{group}</div>{visibleMenu.filter(item=>item.group===group).map(({label,icon:Icon,title,aliases})=><button key={label} title={title||label} aria-current={page===label||aliases?.includes(page)?"page":undefined} className={page===label||aliases?.includes(page)?"active":""} onClick={()=>{setPage(label);setNavOpen(false)}}><Icon size={18}/><span>{title||label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</div>)}</nav>
       <div className="side-bottom">
         <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>{if(window.confirm("Sair? Confira o salvamento ou exporte alterações pendentes antes de sair."))void signOut()}} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
@@ -105,7 +106,7 @@ function AppShell() {
     <main>
       <header><button className="mobile-menu rs-menu-button" aria-label="Abrir menu" aria-expanded={navOpen} onClick={()=>setNavOpen(v=>!v)}><Menu/></button><div className="global-search"><Search size={18}/><input value={search} onChange={e=>openGlobalSearch(e.target.value)} placeholder="Buscar chamado, filial ou técnico..."/><kbd>⌘ K</kbd></div><div className="header-actions"><button onClick={toggleMode} title="Modo mobile"><Smartphone size={19}/></button><span className={`data-mode-pill ${dataMode}`}>{dataMode==="cloud"?"Nuvem":"Local"}</span><button><CircleHelp size={19}/></button><button className="notif"><Bell size={19}/><i/></button><div className="avatar small">{userInitials}</div></div></header>
       <section className={`content page-${page.toLowerCase().replace(/[^a-z0-9]/g,"")}`}>
-        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 4.7.2 — Carteira compartilhada":"Modo local"}</b><span>{"Salvamento automático da carteira. Estoque móvel permanece local."}</span></div>
+        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 4.8 — Carteira compartilhada":"Modo local"}</b><span>{dataMode==="cloud"?"Salvamento automático da carteira. Estoque móvel compartilhado.":"Dados locais neste navegador."}</span></div>
         {fieldEvents.error&&<div className="routing-warning" role="alert">Execução em campo: consulta falhou; informações podem estar desatualizadas. {fieldEvents.error}</div>}{lastImport&&<div style={{fontSize:12,color:"#475569",margin:"8px 0"}}>Última importação Movidesk registrada: {new Date(lastImport).toLocaleString("pt-BR")} · atualização por arquivo, não em tempo real</div>}
         {persistenceError&&<div className="persistence-banner"><AlertTriangle size={18}/><div><b>Atenção à persistência local</b><span>{persistenceError}</span></div></div>}
         {page==="Dashboard"&&<Dashboard go={setPage}/>}
@@ -115,7 +116,7 @@ function AppShell() {
         {page==="Montar rota"&&<RouteErrorBoundary><RouteBuilder target={routeTarget} flash={flash} items={appTickets} setItems={setAppTickets}/></RouteErrorBoundary>}
         
         {page==="Mapa Estratégico das Filiais"&&<RouteErrorBoundary><OperationalMap/></RouteErrorBoundary>}
-        {page==="Estoque móvel"&&<VehicleInventory/>}
+        {page==="Estoque móvel"&&(dataMode==="cloud"?<CloudVehicleInventory/>:<VehicleInventory/>)}
         {(page==="Filiais"||page==="Postos")&&<><SectionTabs label="Filiais e postos" active={page} onChange={setPage} options={[{value:"Postos",label:"Chamados por posto"},{value:"Filiais",label:"Cadastro de filiais"}]}/>{page==="Filiais"?<Branches flash={flash}/>:<PostosBoard/>}</>}
         {(page==="Analistas"||page==="Técnicos"||page==="Usuários")&&<><SectionTabs label="Equipe" active={page} onChange={setPage} options={[{value:"Técnicos",label:"Técnicos"},{value:"Analistas",label:"Analistas"},...(can(role,"users.manage")?[{value:"Usuários" as Page,label:"Acessos"}]:[])]}/>{page==="Analistas"?<Analysts flash={flash}/>:page==="Técnicos"?<Technicians flash={flash}/>:can(role,"users.manage")?<UsersPage flash={flash}/>:<div className="panel restricted-page"><ShieldCheck/><h2>Acesso restrito</h2></div>}</>}
         {page==="Importar chamados"&&<ImportTickets flash={flash}/>} 
