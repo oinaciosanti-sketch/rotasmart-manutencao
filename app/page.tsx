@@ -23,7 +23,7 @@ import CloudMigrationPanel from "./components/CloudMigrationPanel";
 import UsersPage from "./components/UsersPage";
 import TechnicianPortal from "./components/TechnicianPortal";
 import MobileAnalystPanel from "./components/MobileAnalystPanel";
-import TechnicalReport from "./components/TechnicalReport";
+import OnlineTechnicalReport from "./components/OnlineTechnicalReport";
 import { FieldAdmin, FieldTechnician, FieldEvents, useFieldEvents, matchFieldJob, FieldBadge, RouteDispatch } from "./components/FieldPilot";
 import { OnlinePilot } from "./components/OnlinePilot";
 import { SharedWorkspace, SharedWorkspaceBar } from "./components/SharedWorkspace";
@@ -93,7 +93,7 @@ function AppShell() {
   </div>;
   return <div className={`app role-${role}${cloudBusy?" cloud-busy":""}`} aria-busy={cloudBusy}>
     <aside className={`sidebar ${navOpen?"rs-nav-open":""}`}>
-      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 3.2</span></div></div>
+      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 3.3</span></div></div>
       <nav>{visibleMenu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>{setPage(label);setNavOpen(false)}}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
       <div className="side-bottom"><button onClick={()=>{setPage("Configurações");setNavOpen(false)}}><CircleHelp size={18}/>Configurações e backup</button>
         <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>{if(window.confirm("Sair? Publique ou exporte alterações pendentes antes de sair."))void signOut()}} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
@@ -103,7 +103,7 @@ function AppShell() {
     <main>
       <header><button className="mobile-menu rs-menu-button" aria-label="Abrir menu" aria-expanded={navOpen} onClick={()=>setNavOpen(v=>!v)}><Menu/></button><div className="global-search"><Search size={18}/><input value={search} onChange={e=>openGlobalSearch(e.target.value)} placeholder="Buscar chamado, filial ou técnico..."/><kbd>⌘ K</kbd></div><div className="header-actions"><button onClick={toggleMode} title="Modo mobile"><Smartphone size={19}/></button><span className={`data-mode-pill ${dataMode}`}>{dataMode==="cloud"?"Nuvem":"Local"}</span><button><CircleHelp size={19}/></button><button className="notif"><Bell size={19}/><i/></button><div className="avatar small">{userInitials}</div></div></header>
       <section className={`content page-${page.toLowerCase().replace(/[^a-z0-9]/g,"")}`}>
-        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 3.2 — Carteira compartilhada":"Modo local"}</b><span>{"Use a barra superior para publicar ou receber alterações. Estoque móvel permanece local."}</span></div>
+        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 3.3 — Carteira compartilhada":"Modo local"}</b><span>{"Use a barra superior para publicar ou receber alterações. Estoque móvel permanece local."}</span></div>
         {fieldEvents.error&&<div className="routing-warning" role="alert">Execução em campo: consulta falhou; informações podem estar desatualizadas. {fieldEvents.error}</div>}{lastImport&&<div style={{fontSize:12,color:"#475569",margin:"8px 0"}}>Última importação Movidesk registrada: {new Date(lastImport).toLocaleString("pt-BR")} · atualização por arquivo, não em tempo real</div>}
         {persistenceError&&<div className="persistence-banner"><AlertTriangle size={18}/><div><b>Atenção à persistência local</b><span>{persistenceError}</span></div></div>}
         {page==="Dashboard"&&<Dashboard go={setPage}/>}
@@ -216,7 +216,7 @@ function TicketCard({t}:{t:Ticket}){return <div className="ticket-card"><div><b>
 function TicketModal({ticket,error="",onChange,onCancel,onSave,onCancelTicket,onDelete,onOfficialComplete}:{ticket:Ticket;error?:string;onChange:(t:Ticket)=>void;onCancel:()=>void;onSave:()=>void;onCancelTicket?:()=>void;onDelete?:()=>void;onOfficialComplete?:()=>void}){
  const {technicians:techs,branches:filiaisBase,analysts}=useAppData();
  const set=(k:keyof Ticket,v:any)=>onChange({...ticket,[k]:v}); const selectBranch=(id:string)=>{const f=filiaisBase.find(x=>String(x.id)===id);if(f)onChange({...ticket,branch:f.nome,branchId:f.id,branchNumber:f.numeroFilial,branchCnpj:f.cnpj,city:`${f.cidade}, ${f.uf}`,uf:f.uf,address:f.endereco,latitude:f.latitude,longitude:f.longitude,reviewBranch:false});else onChange({...ticket,branch:"Filial não localizada",branchId:undefined,branchNumber:undefined,branchCnpj:undefined,city:"",uf:"",address:"",latitude:null,longitude:null,reviewBranch:true})};
- return <div className="modal-bg tech-modal-bg"><div className="tech-modal ticket-modal"><div className="tech-modal-head"><div><span className="eyebrow">CHAMADO</span><h2>{ticket.id?`Editar ${ticket.number}`:"Novo chamado"}</h2><p>Dados do atendimento e planejamento operacional.</p></div><button onClick={onCancel}><X/></button></div><TechnicalReport ticket={ticket} mode="viewer"/><div className="tech-form">
+ return <div className="modal-bg tech-modal-bg"><div className="tech-modal ticket-modal"><div className="tech-modal-head"><div><span className="eyebrow">CHAMADO</span><h2>{ticket.id?`Editar ${ticket.number}`:"Novo chamado"}</h2><p>Dados do atendimento e planejamento operacional.</p></div><button onClick={onCancel}><X/></button></div><OnlineTechnicalReport ticket={ticket}/><div className="tech-form">
  <label className="field"><span>Número *</span><input value={ticket.number} readOnly={!!ticket.id} title={ticket.id?"Número permanente do chamado":"Informe um número único"} onChange={e=>set("number",e.target.value)}/></label><label className="field"><span>Status</span><select value={ticket.status} onChange={e=>set("status",e.target.value)}>{["Novo","Programado","Aguardando compra","Aguardando entrega","Em atendimento","Concluído","Cancelado"].map(x=><option key={x}>{x}</option>)}</select></label>
  <label className="field span-2"><span>Filial</span><select value={filiaisBase.find(f=>f.numeroFilial===ticket.branchNumber)?.id||""} onChange={e=>selectBranch(e.target.value)}><option value="">Filial não localizada / informar cidade</option>{filiaisBase.map(f=><option key={f.id} value={f.id}>{f.numeroFilial} — {f.nome} — {f.cidade}</option>)}</select></label><label className="field"><span>Cidade *</span><input value={ticket.city} onChange={e=>set("city",e.target.value)}/></label><label className="field"><span>UF</span><input value={ticket.uf||""} maxLength={2} onChange={e=>set("uf",e.target.value.toUpperCase())}/></label><label className="field span-2"><span>Endereço</span><input value={ticket.address} onChange={e=>set("address",e.target.value)}/></label>
  {ticket.sourceFields?.subject ? <>
