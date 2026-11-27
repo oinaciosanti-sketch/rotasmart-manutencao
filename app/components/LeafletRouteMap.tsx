@@ -47,7 +47,7 @@ const validGeometry = (geometry: LeafletRoute["geometry"]): geometry is Array<[n
   Array.isArray(geometry) && geometry.length >= 2 && geometry.every((point) =>
     Array.isArray(point) && point.length === 2 && isValidCoordinate(point[0], point[1]));
 
-function FitMap({ routes }: { routes: LeafletRoute[] }) {
+function FitMap({ routes, hideNotices=false }: { routes: LeafletRoute[]; hideNotices?:boolean }) {
   const map = useMap();
 
   useEffect(() => {
@@ -74,7 +74,7 @@ function FitMap({ routes }: { routes: LeafletRoute[] }) {
   return null;
 }
 
-export default function LeafletRouteMap({ routes }: { routes: LeafletRoute[] }) {
+export default function LeafletRouteMap({ routes, hideNotices=false }: { routes: LeafletRoute[]; hideNotices?:boolean }) {
   const safeRoutes = Array.isArray(routes) ? routes : [];
   const defaultCenter: LatLngExpression = [-26.4996185, -49.08767128];
   const startMissing = safeRoutes.some(
@@ -195,13 +195,13 @@ export default function LeafletRouteMap({ routes }: { routes: LeafletRoute[] }) 
         })}
       </MapContainer>
 
-      <div className="leaflet-notices" role="status">
+      {!hideNotices&&<div className="leaflet-notices" role="status">
         {notices.map((notice) => (
           <div className="leaflet-approx-note" key={notice}>
             {notice}
           </div>
         ))}
-      </div>
+      </div>}
     </div>
   );
 }
