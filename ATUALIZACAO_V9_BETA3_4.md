@@ -1,0 +1,6 @@
+# Beta 3.4 — RotaSmart Share e confirmação de ações
+- Publique a carteira ou exporte o rascunho antes do deploy. Suba os arquivos na raiz da branch v9-online. Não execute novo SQL: utiliza as funções e a tabela field_evidence já instaladas.
+- Após terminar um atendimento, os botões ficam bloqueados até a consulta confirmar a ação. Iniciar requer confirmação explícita do número e filial. Não inicia automaticamente outro chamado. Se a consulta falhar persistentemente, confira o estado recarregando a página.
+- Em atendimento encerrado, abra o cartão e prepare o relatório para compartilhar. Escolha WhatsApp e o grupo pelo menu nativo; o envio é manual. Compatibilidade de fotos e texto simultâneos depende do dispositivo/app. Há cópia e download separados.
+- Teste com dados fictícios: finalize um chamado e confirme que o próximo permanece aguardando; cancele a confirmação de início e verifique que nada mudou. Teste compartilhar texto e foto, cancelar compartilhamento e copiar. Verifique que o status oficial não mudou.
+- Sem alteração do banco ou envio automático ao WhatsApp. Mapa Live e compartilhamento da rota diária continuam planejados. Build completo e teste em dispositivo real pendentes.

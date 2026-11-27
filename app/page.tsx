@@ -93,7 +93,7 @@ function AppShell() {
   </div>;
   return <div className={`app role-${role}${cloudBusy?" cloud-busy":""}`} aria-busy={cloudBusy}>
     <aside className={`sidebar ${navOpen?"rs-nav-open":""}`}>
-      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 3.3</span></div></div>
+      <div className="brand"><div className="brandmark"><Route size={22}/></div><div><b>RotaSmart</b><span>VERSION 9.0 BETA 3.4</span></div></div>
       <nav>{visibleMenu.map(({label,icon:Icon})=><button key={label} className={page===label?"active":""} onClick={()=>{setPage(label);setNavOpen(false)}}><Icon size={18}/><span>{label}</span>{label==="Chamados"&&<em>{appTickets.length}</em>}</button>)}</nav>
       <div className="side-bottom"><button onClick={()=>{setPage("Configurações");setNavOpen(false)}}><CircleHelp size={18}/>Configurações e backup</button>
         <div className="profile"><div className="avatar">{userInitials}</div><div><b>{userName}</b><span>{configured?`${profile?.role||"visualizador"}${profile?.analystName?` · Analista: ${profile.analystName}`:""}`:"Modo local"}</span></div>{configured?<button className="profile-logout" onClick={()=>{if(window.confirm("Sair? Publique ou exporte alterações pendentes antes de sair."))void signOut()}} title="Sair"><LogOut size={17}/></button>:<MoreHorizontal size={18}/>}</div>
@@ -103,7 +103,7 @@ function AppShell() {
     <main>
       <header><button className="mobile-menu rs-menu-button" aria-label="Abrir menu" aria-expanded={navOpen} onClick={()=>setNavOpen(v=>!v)}><Menu/></button><div className="global-search"><Search size={18}/><input value={search} onChange={e=>openGlobalSearch(e.target.value)} placeholder="Buscar chamado, filial ou técnico..."/><kbd>⌘ K</kbd></div><div className="header-actions"><button onClick={toggleMode} title="Modo mobile"><Smartphone size={19}/></button><span className={`data-mode-pill ${dataMode}`}>{dataMode==="cloud"?"Nuvem":"Local"}</span><button><CircleHelp size={19}/></button><button className="notif"><Bell size={19}/><i/></button><div className="avatar small">{userInitials}</div></div></header>
       <section className={`content page-${page.toLowerCase().replace(/[^a-z0-9]/g,"")}`}>
-        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 3.3 — Carteira compartilhada":"Modo local"}</b><span>{"Use a barra superior para publicar ou receber alterações. Estoque móvel permanece local."}</span></div>
+        <div className={`data-mode-banner ${dataMode}`}><b>{dataMode==="cloud"?"Beta 3.4 — Carteira compartilhada":"Modo local"}</b><span>{"Use a barra superior para publicar ou receber alterações. Estoque móvel permanece local."}</span></div>
         {fieldEvents.error&&<div className="routing-warning" role="alert">Execução em campo: consulta falhou; informações podem estar desatualizadas. {fieldEvents.error}</div>}{lastImport&&<div style={{fontSize:12,color:"#475569",margin:"8px 0"}}>Última importação Movidesk registrada: {new Date(lastImport).toLocaleString("pt-BR")} · atualização por arquivo, não em tempo real</div>}
         {persistenceError&&<div className="persistence-banner"><AlertTriangle size={18}/><div><b>Atenção à persistência local</b><span>{persistenceError}</span></div></div>}
         {page==="Dashboard"&&<Dashboard go={setPage}/>}
