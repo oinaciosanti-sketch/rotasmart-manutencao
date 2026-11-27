@@ -1,0 +1,5 @@
+# RotaSmart V9.0 Beta 4.5 — Control
+Aplicar sobre Beta 4.4 na branch v9-online. Não requer SQL. Exportar rascunho antes de atualizar. Substituir arquivos mantendo os caminhos.
+Central de operações: lista e mapa compartilham técnico/data e consulta FieldEvents. Modos Dividido, Lista, Mapa Live, Rotas planejadas. O mapa planejado mantém seus próprios filtros. A edição permanece em Montar rota. A aba antiga de mapa permanece como destino interno de atalhos, sem duplicação no menu. Portal técnico e Smart Sync preservados.
+Montar rota: prévia existente movida para painel recolhível acima da sequência. Inteligência territorial: camada de rede, abertos, atrasados (datas anteriores ao dia local), alta urgência. Preserva planejador estratégico existente. Sem GPS real. Sem recorrência/cobertura territorial ou transferência de sugestões entre módulos nesta etapa. Postos/Filiais e Analistas/Técnicos permanecem separados.
+Validação: sintaxe TypeScript/TSX verificada via transpileModule; não equivale a build completo ou teste no navegador. Homologar com dados fictícios e confirmar Vercel Ready antes de uso. Não migrar dados corporativos ainda.
